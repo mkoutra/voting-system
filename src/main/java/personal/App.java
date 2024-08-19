@@ -25,7 +25,7 @@ public class App {
                     insertNewUser.setVisible(false);
 
                     votingWindow.setLocationRelativeTo(null);
-                    votingWindow.setVisible(true);
+                    votingWindow.setVisible(false);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

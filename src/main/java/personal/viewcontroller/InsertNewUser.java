@@ -1,19 +1,27 @@
 package personal.viewcontroller;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import com.toedter.calendar.JDateChooser;
+import org.mindrot.jbcrypt.BCrypt;
+import personal.dao.IUserDAO;
+import personal.dao.UserDAOImpl;
+import personal.dao.exceptions.UserDAOException;
+import personal.dto.UserInsertDTO;
+import personal.service.IUserService;
+import personal.service.UserServiceImpl;
 
 import java.awt.Color;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JPasswordField;
-import javax.swing.JButton;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Date;
 
 public class InsertNewUser extends JFrame {
+
+	private final IUserDAO userDAO = new UserDAOImpl();
+	private final IUserService userService = new UserServiceImpl(userDAO);
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -98,6 +106,30 @@ public class InsertNewUser extends JFrame {
 		contentPane.add(dateOfBirth);
 		
 		JButton submitBtn = new JButton("Submit");
+		submitBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				UserInsertDTO insertDTO = new UserInsertDTO();
+				insertDTO.setUsername(usernameText.getText().trim());
+				insertDTO.setEmail(emailText.getText().trim());
+				insertDTO.setFirstname(firstnameText.getText().trim());
+				insertDTO.setLastname(lastnameText.getText().trim());
+				insertDTO.setDateOfBirth(dateOfBirth.getDate());
+				insertDTO.setPassword(new String(passwordField.getPassword()).trim());
+				insertDTO.setReEnteredPassword(new String(reEnterPasswordField.getPassword()).trim());
+
+				// TODO: Validation
+
+				try {
+					userService.insertUser(insertDTO);
+					JOptionPane.showMessageDialog(null,
+							"Welcome " + insertDTO.getUsername() + "! Your account has been created successfully.",
+							"Successful Insertion", JOptionPane.INFORMATION_MESSAGE);
+				} catch (UserDAOException e1) {
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(null, "User insertion error", "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		submitBtn.setForeground(new Color(52, 101, 164));
 		submitBtn.setBounds(160, 362, 117, 25);
 		contentPane.add(submitBtn);

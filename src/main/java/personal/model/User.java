@@ -28,14 +28,6 @@ public class User {
         this.votedCid = votedCid;
     }
 
-    public Date getDob() {
-        return dob;
-    }
-
-    public void setDob(Date dob) {
-        this.dob = dob;
-    }
-
     public Integer getUid() {
         return uid;
     }
@@ -84,6 +76,14 @@ public class User {
         this.lastname = lastname;
     }
 
+    public Date getDob() {
+        return dob;
+    }
+
+    public void setDob(Date dob) {
+        this.dob = dob;
+    }
+
     public Integer getHasVoted() {
         return hasVoted;
     }
@@ -109,6 +109,7 @@ public class User {
                 ", email='" + email + '\'' +
                 ", firstname='" + firstname + '\'' +
                 ", lastname='" + lastname + '\'' +
+                ", dob=" + dob +
                 ", hasVoted=" + hasVoted +
                 ", votedCid=" + votedCid +
                 '}';

@@ -79,4 +79,17 @@ public class UserInsertDTO {
     public void setReEnteredPassword(String reEnteredPassword) {
         this.reEnteredPassword = reEnteredPassword;
     }
+
+    @Override
+    public String toString() {
+        return "UserInsertDTO{" +
+                "username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", firstname='" + firstname + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", password='" + password + '\'' +
+                ", reEnteredPassword='" + reEnteredPassword + '\'' +
+                '}';
+    }
 }
