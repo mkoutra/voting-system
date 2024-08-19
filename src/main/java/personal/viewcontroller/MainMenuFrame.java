@@ -1,5 +1,7 @@
 package personal.viewcontroller;
 
+import personal.App;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -97,8 +99,8 @@ public class MainMenuFrame extends JFrame {
 		JButton createAccountBtn = new JButton("Sign up");
 		createAccountBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Main.getInsertNewUser().setVisible(true);
-				Main.getMainMenuFrame().setEnabled(false);
+				App.getInsertNewUser().setVisible(true);
+				App.getMainMenuFrame().setEnabled(false);
 			}
 		});
 		createAccountBtn.setFont(new Font("Dialog", Font.BOLD, 12));
