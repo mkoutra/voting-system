@@ -27,6 +27,7 @@ public class MainMenuFrame extends JFrame {
 	 * Create the frame.
 	 */
 	public MainMenuFrame() {
+		setResizable(false);
 		setTitle("Voting");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 448, 346);

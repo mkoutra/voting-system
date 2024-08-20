@@ -1,15 +1,15 @@
 package personal;
 
-import personal.viewcontroller.InsertNewUser;
+import personal.viewcontroller.InsertNewUserFrame;
 import personal.viewcontroller.MainMenuFrame;
-import personal.viewcontroller.VotingWindow;
+import personal.viewcontroller.VotingFrame;
 
 import java.awt.EventQueue;
 
 public class App {
     private final static MainMenuFrame mainMenuFrame = new MainMenuFrame();
-    private final static InsertNewUser insertNewUser = new InsertNewUser();
-    private final static VotingWindow votingWindow = new VotingWindow();
+    private final static InsertNewUserFrame insertNewUserFrame = new InsertNewUserFrame();
+    private final static VotingFrame votingFrame = new VotingFrame();
 
     /**
      * Launch the application.
@@ -21,11 +21,11 @@ public class App {
                     mainMenuFrame.setLocationRelativeTo(null);
                     mainMenuFrame.setVisible(true);
 
-                    insertNewUser.setLocationRelativeTo(null);
-                    insertNewUser.setVisible(false);
+                    insertNewUserFrame.setLocationRelativeTo(null);
+                    insertNewUserFrame.setVisible(true);
 
-                    votingWindow.setLocationRelativeTo(null);
-                    votingWindow.setVisible(false);
+                    votingFrame.setLocationRelativeTo(null);
+                    votingFrame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -37,11 +37,11 @@ public class App {
         return mainMenuFrame;
     }
 
-    public static InsertNewUser getInsertNewUser() {
-        return insertNewUser;
+    public static InsertNewUserFrame getInsertNewUser() {
+        return insertNewUserFrame;
     }
 
-    public static VotingWindow getVotingWindow() {
-        return votingWindow;
+    public static VotingFrame getVotingWindow() {
+        return votingFrame;
     }
 }

@@ -15,7 +15,7 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.border.BevelBorder;
 
-public class VotingWindow extends JFrame {
+public class VotingFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -27,7 +27,8 @@ public class VotingWindow extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public VotingWindow() {
+	public VotingFrame() {
+		setResizable(false);
 		setTitle("Voting");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 503, 303);
@@ -73,7 +74,7 @@ public class VotingWindow extends JFrame {
 		scrollPane.setViewportView(candidatesTable);
 		candidatesTable.setModel(new DefaultTableModel(
 			new Object[][] {},
-			new String[] {"ID", "Firstname", "Lastname"}
+			new String[] {"ID", "First name", "Last name"}
 		));
 		
 		JPanel panel = new JPanel();

@@ -8,4 +8,7 @@ public interface IUserDAO {
     User update(User user) throws UserDAOException;
     void delete(Integer uid) throws UserDAOException;
     User getById(Integer uid) throws UserDAOException;
+    User getByUsername(String username) throws UserDAOException;
+    boolean usernameExists(String username) throws UserDAOException;
+    boolean emailExists(String email) throws UserDAOException;
 }

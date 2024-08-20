@@ -19,6 +19,16 @@ public class UserServiceImpl implements IUserService {
         userDAO.insert(user);
     }
 
+    @Override
+    public boolean userExistsByUsername(String username) throws UserDAOException {
+        return userDAO.usernameExists(username);
+    }
+
+    @Override
+    public boolean userExistsByEmail(String email) throws UserDAOException {
+        return userDAO.emailExists(email);
+    }
+
     private static User mapUserInsertDTOToUser(UserInsertDTO dto) {
         User user = new User();
         user.setUsername(dto.getUsername());

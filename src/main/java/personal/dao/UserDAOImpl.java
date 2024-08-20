@@ -106,4 +106,77 @@ public class UserDAOImpl implements IUserDAO {
             throw new UserDAOException("SQL error in get user by id = " + uid);
         }
     }
+
+    @Override
+    public User getByUsername(String username) throws UserDAOException {
+        String sql = "SELECT * FROM users WHERE username = ?";
+        User user = null;
+
+        try(Connection connection = DBUtil.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                user = new User();
+                user.setUid(rs.getInt("uid"));
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setFirstname(rs.getString("firstname"));
+                user.setLastname(rs.getString("lastname"));
+                user.setDob(rs.getDate("dob"));
+                user.setPassword(rs.getString("password"));
+                user.setHasVoted(rs.getInt("hasVoted"));
+                user.setVotedCid(rs.getInt("voted_cid"));
+            }
+
+            return user;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new UserDAOException("SQL error in get user by username = " + username);
+        }
+    }
+
+    @Override
+    public boolean usernameExists(String username) throws UserDAOException {
+        String sql = "SELECT COUNT(1) FROM users WHERE username = ?";
+        int userExists = 0;
+
+        try (Connection connection = DBUtil.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                userExists = rs.getInt(1);
+            }
+
+            return userExists != 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new UserDAOException("SQL error in usernameExists for username = " + username);
+        }
+    }
+
+    @Override
+    public boolean emailExists(String email) throws UserDAOException {
+        String sql = "SELECT COUNT(1) FROM users WHERE email = ?";
+        int userExists = 0;
+
+        try (Connection connection = DBUtil.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                userExists = rs.getInt(1);
+            }
+
+            return userExists != 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new UserDAOException("SQL error in emailExists for email = " + email);
+        }
+    }
 }

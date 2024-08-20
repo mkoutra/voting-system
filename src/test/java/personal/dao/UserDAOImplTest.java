@@ -55,4 +55,19 @@ class UserDAOImplTest {
         User retrievedUser = userDAO.getById(3);
         assertNull(retrievedUser);
     }
+
+    @Test
+    void getByUsername() throws UserDAOException {
+        User foundUser = userDAO.getByUsername("gkoutraa");
+        System.out.println(foundUser);
+        assertNull(foundUser);
+    }
+
+    @Test
+    void userExistence() throws UserDAOException {
+        boolean userExistsByUsername = userDAO.usernameExists("user007");
+        boolean userExistsByEmail = userDAO.emailExists("abc@gmail.com");
+        assertTrue(userExistsByUsername);
+        assertTrue(userExistsByEmail);
+    }
 }

@@ -10,7 +10,7 @@ public class DBUtil {
     static {
         ds.setUrl("jdbc:mysql://127.0.0.1:3306/votingDB?serverTimeZone=UTC");
         ds.setUsername("votingUser");
-//        ds.setPassword();
+        ds.setPassword("voting");
         ds.setInitialSize(10);
         ds.setMaxTotal(50);
         ds.setMinIdle(5);
