@@ -23,6 +23,7 @@ public class InsertNewUserFrame extends JFrame {
 	private final IUserService userService = new UserServiceImpl(userDAO);
 
 	private static final long serialVersionUID = 1L;
+
 	private JPanel contentPane;
 	private JTextField usernameText;
 	private JTextField emailText;
@@ -295,6 +296,7 @@ public class InsertNewUserFrame extends JFrame {
 
 				// Validation
 				errors = newUservalidator.validate(insertDTO);
+
 				if (!errors.isEmpty()) {
 					usernameErrorLabel.setText(errors.getOrDefault("username", ""));
 					emailErrorLabel.setText(errors.getOrDefault("email", ""));
@@ -307,12 +309,14 @@ public class InsertNewUserFrame extends JFrame {
 					return;
 				}
 
+				// Insert to DB and clean text and labels
 				try {
 					userService.insertUser(insertDTO);
+					cleanAll();
+
 					JOptionPane.showMessageDialog(null,
 							"Welcome " + insertDTO.getUsername() + "!\nYour account has been created successfully.",
 							"Successful Insertion", JOptionPane.INFORMATION_MESSAGE);
-					cleanAll();
 				} catch (UserDAOException e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(null, "User insertion error",

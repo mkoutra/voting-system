@@ -1,6 +1,7 @@
 package personal.viewcontroller;
 
 import personal.App;
+import personal.dto.UserReadOnlyDTO;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -71,6 +72,14 @@ public class MainMenuFrame extends JFrame {
 		passwordField.setForeground(new Color(52, 101, 164));
 		
 		JButton submitBtn = new JButton("Sign in");
+		submitBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				App.getVotingWindow().setVoterReadOnlyDTO(new UserReadOnlyDTO("testUsername", "testFirstname", "testLastname"));
+				App.getVotingWindow().setVisible(true);
+				App.getMainMenuFrame().setEnabled(false);
+				App.getMainMenuFrame().setVisible(false);
+			}
+		});
 		submitBtn.setBounds(76, 140, 161, 25);
 		panel.add(submitBtn);
 		submitBtn.setForeground(new Color(52, 101, 164));

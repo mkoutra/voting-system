@@ -22,10 +22,10 @@ public class App {
                     mainMenuFrame.setVisible(true);
 
                     insertNewUserFrame.setLocationRelativeTo(null);
-                    insertNewUserFrame.setVisible(true);
+                    insertNewUserFrame.setVisible(false);
 
                     votingFrame.setLocationRelativeTo(null);
-                    votingFrame.setVisible(true);
+                    votingFrame.setVisible(false);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

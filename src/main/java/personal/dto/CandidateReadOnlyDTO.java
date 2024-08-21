@@ -1,23 +1,16 @@
-package personal.model;
+package personal.dto;
 
-public class Candidate {
+public class CandidateReadOnlyDTO {
     private Integer cid;
     private String firstname;
     private String lastname;
 
-    public Candidate() {}
+    public CandidateReadOnlyDTO() {}
 
-    public Candidate(Integer cid, String firstname, String lastname) {
+    public CandidateReadOnlyDTO(Integer cid, String firstname, String lastname) {
         this.cid = cid;
         this.firstname = firstname;
         this.lastname = lastname;
-    }
-
-    // Copy Constructor
-    public Candidate(Candidate candidate) {
-        this.cid = candidate.getCid();
-        this.firstname = candidate.getFirstname();
-        this.lastname = candidate.getLastname();
     }
 
     public Integer getCid() {
@@ -42,14 +35,5 @@ public class Candidate {
 
     public void setLastname(String lastname) {
         this.lastname = lastname;
-    }
-
-    @Override
-    public String toString() {
-        return "Candidate{" +
-                "cid=" + cid +
-                ", firstname='" + firstname + '\'' +
-                ", lastname='" + lastname + '\'' +
-                '}';
     }
 }

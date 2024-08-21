@@ -28,6 +28,19 @@ public class User {
         this.votedCid = votedCid;
     }
 
+    // Copy constructor
+    public User(User user) {
+        this.uid = user.getUid();
+        this.username = user.getUsername();
+        this.password = user.getPassword();
+        this.email = user.getEmail();
+        this.firstname = user.getFirstname();
+        this.lastname = user.getLastname();
+        this.dob = user.getDob();
+        this.hasVoted = user.getHasVoted();
+        this.votedCid = user.getVotedCid();
+    }
+
     public Integer getUid() {
         return uid;
     }
