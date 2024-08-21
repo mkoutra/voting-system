@@ -1,23 +1,28 @@
 package personal.viewcontroller;
 
 import personal.App;
+import personal.dao.IUserDAO;
+import personal.dao.UserDAOImpl;
+import personal.dao.exceptions.UserDAOException;
+import personal.dto.UserLoginDTO;
 import personal.dto.UserReadOnlyDTO;
+import personal.model.User;
+import personal.service.IUserService;
+import personal.service.UserServiceImpl;
+import personal.service.exceptions.UserNotFoundException;
+import personal.validator.LoginValidator;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
 import java.awt.Color;
-import javax.swing.JTextField;
-import javax.swing.JPasswordField;
-import javax.swing.JButton;
-import javax.swing.SwingConstants;
 import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.border.BevelBorder;
 
 public class MainMenuFrame extends JFrame {
+	private final IUserDAO userDAO = new UserDAOImpl();
+	private final IUserService userService = new UserServiceImpl(userDAO);
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -47,7 +52,7 @@ public class MainMenuFrame extends JFrame {
 		panel.setLayout(null);
 		
 		JLabel lblNewLabel = new JLabel("Login");
-		lblNewLabel.setBounds(133, 12, 47, 15);
+		lblNewLabel.setBounds(138, 12, 47, 15);
 		panel.add(lblNewLabel);
 		lblNewLabel.setForeground(new Color(52, 101, 164));
 		
@@ -57,44 +62,30 @@ public class MainMenuFrame extends JFrame {
 		usernameLabel.setForeground(new Color(52, 101, 164));
 		
 		usernameText = new JTextField();
-		usernameText.setBounds(98, 43, 201, 25);
+		usernameText.setBounds(98, 42, 201, 25);
 		panel.add(usernameText);
 		usernameText.setColumns(10);
 		
 		JLabel passwordLabel = new JLabel("Password");
-		passwordLabel.setBounds(14, 95, 77, 15);
+		passwordLabel.setBounds(12, 81, 77, 15);
 		panel.add(passwordLabel);
 		passwordLabel.setForeground(new Color(52, 101, 164));
 		
 		passwordField = new JPasswordField();
-		passwordField.setBounds(98, 91, 201, 25);
+		passwordField.setBounds(98, 76, 201, 25);
 		panel.add(passwordField);
 		passwordField.setForeground(new Color(52, 101, 164));
-		
-		JButton submitBtn = new JButton("Sign in");
-		submitBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				App.getVotingWindow().setVoterReadOnlyDTO(new UserReadOnlyDTO("testUsername", "testFirstname", "testLastname"));
-				App.getVotingWindow().setVisible(true);
-				App.getMainMenuFrame().setEnabled(false);
-				App.getMainMenuFrame().setVisible(false);
-			}
-		});
-		submitBtn.setBounds(76, 140, 161, 25);
-		panel.add(submitBtn);
-		submitBtn.setForeground(new Color(52, 101, 164));
-		
-		JLabel usernameErrorLabel = new JLabel("");
-		usernameErrorLabel.setForeground(new Color(204, 0, 0));
-		usernameErrorLabel.setFont(new Font("Dialog", Font.PLAIN, 10));
-		usernameErrorLabel.setBounds(98, 65, 225, 15);
-		panel.add(usernameErrorLabel);
-		
-		JLabel passwordErrorLabel = new JLabel("");
-		passwordErrorLabel.setForeground(new Color(204, 0, 0));
-		passwordErrorLabel.setFont(new Font("Dialog", Font.PLAIN, 10));
-		passwordErrorLabel.setBounds(98, 113, 225, 15);
-		panel.add(passwordErrorLabel);
+
+		JTextArea failedLoginText = new JTextArea();
+		failedLoginText.setForeground(new Color(204, 0, 0));
+		failedLoginText.setBackground(new Color(255, 255, 255));
+		failedLoginText.setWrapStyleWord(true);
+		failedLoginText.setLineWrap(true);
+		failedLoginText.setFont(new Font("Dialog", Font.PLAIN, 11));
+		failedLoginText.setText("Login failed. Please check your credentials and try again.");
+		failedLoginText.setBounds(98, 107, 201, 28);
+		failedLoginText.setVisible(false);
+		panel.add(failedLoginText);
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(null);
@@ -105,7 +96,27 @@ public class MainMenuFrame extends JFrame {
 		createAccountLabel.setFont(new Font("Dialog", Font.PLAIN, 11));
 		panel_1.add(createAccountLabel);
 		createAccountLabel.setVerticalAlignment(SwingConstants.TOP);
-		
+
+		JButton submitBtn = new JButton("Sign in");
+		submitBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				UserLoginDTO userLoginDTO = createUserLoginDTO();
+				LoginValidator loginValidator = new LoginValidator();
+
+				// Validate
+				if (!loginValidator.validate(userLoginDTO)) {
+					failedLoginText.setVisible(true);
+					return;
+				}
+
+				// Activate Voting Window and close current frame
+				activateVotingWindow(userLoginDTO);
+			}
+		});
+		submitBtn.setBounds(81, 140, 161, 25);
+		panel.add(submitBtn);
+		submitBtn.setForeground(new Color(52, 101, 164));
+
 		JButton createAccountBtn = new JButton("Sign up");
 		createAccountBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -116,7 +127,7 @@ public class MainMenuFrame extends JFrame {
 		createAccountBtn.setFont(new Font("Dialog", Font.BOLD, 12));
 		panel_1.add(createAccountBtn);
 		createAccountBtn.setForeground(new Color(52, 101, 164));
-		
+
 		JPanel panel_2 = new JPanel();
 		panel_2.setLayout(null);
 		panel_2.setBackground(new Color(52, 101, 164));
@@ -127,5 +138,39 @@ public class MainMenuFrame extends JFrame {
 		lblLogInTo.setForeground(new Color(238, 238, 236));
 		lblLogInTo.setBounds(12, 23, 344, 15);
 		panel_2.add(lblLogInTo);
+	}
+
+	private UserLoginDTO createUserLoginDTO() {
+		UserLoginDTO dto = new UserLoginDTO();
+		dto.setUsername(usernameText.getText());
+		dto.setPassword(new String(passwordField.getPassword()));
+		return dto;
+	}
+
+	private UserReadOnlyDTO mapToReadOnlyDTO(UserLoginDTO loginDTO) {
+		UserReadOnlyDTO readOnlyDTO = new UserReadOnlyDTO();
+		try {
+			User user = userService.getUserByUsername(loginDTO.getUsername());
+			readOnlyDTO.setUsername(user.getUsername());
+			readOnlyDTO.setFirstname(user.getFirstname());
+			readOnlyDTO.setLastname(user.getLastname());
+		} catch (UserNotFoundException | UserDAOException e) {
+			e.printStackTrace();	// TODO: implement proper logging
+		}
+		return readOnlyDTO;
+	}
+
+	private void activateVotingWindow(UserLoginDTO userLoginDTO) {
+		UserReadOnlyDTO userReadOnlyDTO = null;
+		// Map to read only dto
+		userReadOnlyDTO = mapToReadOnlyDTO(userLoginDTO);
+
+		// Send user information to votingWindow and activate it
+		App.getVotingWindow().setVoterReadOnlyDTO(userReadOnlyDTO);
+		App.getVotingWindow().setVisible(true);
+
+		// Disable and hide Main Menu Frame
+		App.getMainMenuFrame().setEnabled(false);
+		App.getMainMenuFrame().setVisible(false);
 	}
 }

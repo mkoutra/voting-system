@@ -111,7 +111,7 @@ public class VotingFrame extends JFrame {
 		candidatesTable.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				selectedCandidateReadOnlyDTO = extractSelectedCandidateReadOnlyDTO();
+				selectedCandidateReadOnlyDTO = createSelectedCandidateReadOnlyDTO();
 
 				buildSelectedCandidate(selectedCandidateReadOnlyDTO);
 			}
@@ -211,7 +211,7 @@ public class VotingFrame extends JFrame {
 		return candidateReadOnlyDTO;
 	}
 
-	private CandidateReadOnlyDTO extractSelectedCandidateReadOnlyDTO() {
+	private CandidateReadOnlyDTO createSelectedCandidateReadOnlyDTO() {
 		CandidateReadOnlyDTO candidateReadOnlyDTO = new CandidateReadOnlyDTO();
 		candidateReadOnlyDTO.setCid(Integer.parseInt((String) model.getValueAt(candidatesTable.getSelectedRow(), 0)));
 		candidateReadOnlyDTO.setFirstname((String) model.getValueAt(candidatesTable.getSelectedRow(), 1));

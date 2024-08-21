@@ -5,6 +5,7 @@ import personal.dao.IUserDAO;
 import personal.dao.exceptions.UserDAOException;
 import personal.dto.UserInsertDTO;
 import personal.model.User;
+import personal.service.exceptions.UserNotFoundException;
 
 public class UserServiceImpl implements IUserService {
     private final IUserDAO userDAO;
@@ -27,6 +28,28 @@ public class UserServiceImpl implements IUserService {
     @Override
     public boolean userExistsByEmail(String email) throws UserDAOException {
         return userDAO.emailExists(email);
+    }
+
+    @Override
+    public User getUserByUsername(String username) throws UserNotFoundException, UserDAOException {
+        try {
+           if (!userDAO.usernameExists(username)) {
+               throw new UserNotFoundException("Username: " + username + " does not exist.");
+           }
+           return userDAO.getByUsername(username);
+        } catch (UserDAOException e1) {
+            throw new UserDAOException("SQL error in get user by username: " + username);
+        }
+    }
+
+    @Override
+    public boolean authenticateUser(String username, String plainPassword)
+            throws UserNotFoundException, UserDAOException {
+        if (!userDAO.usernameExists(username)) {
+            throw new UserNotFoundException("Username: " + username + " does not exist.");
+        }
+        User user = userDAO.getByUsername(username);
+        return BCrypt.checkpw(plainPassword, user.getPassword());
     }
 
     private static User mapUserInsertDTOToUser(UserInsertDTO dto) {
