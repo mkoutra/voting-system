@@ -28,6 +28,7 @@ public class MainMenuFrame extends JFrame {
 	private JPanel contentPane;
 	private JTextField usernameText;
 	private JPasswordField passwordField;
+	private JTextArea failedLoginText;
 
 	/**
 	 * Create the frame.
@@ -76,7 +77,7 @@ public class MainMenuFrame extends JFrame {
 		panel.add(passwordField);
 		passwordField.setForeground(new Color(52, 101, 164));
 
-		JTextArea failedLoginText = new JTextArea();
+		failedLoginText = new JTextArea();
 		failedLoginText.setForeground(new Color(204, 0, 0));
 		failedLoginText.setBackground(new Color(255, 255, 255));
 		failedLoginText.setWrapStyleWord(true);
@@ -109,7 +110,9 @@ public class MainMenuFrame extends JFrame {
 					return;
 				}
 
-				// Activate Voting Window and close current frame
+
+				// Activate Voting Window and close current frame.
+				cleanTexts();
 				activateVotingWindow(userLoginDTO);
 			}
 		});
@@ -172,5 +175,11 @@ public class MainMenuFrame extends JFrame {
 		// Disable and hide Main Menu Frame
 		App.getMainMenuFrame().setEnabled(false);
 		App.getMainMenuFrame().setVisible(false);
+	}
+
+	private void cleanTexts() {
+		usernameText.setText("");
+		passwordField.setText("");
+		failedLoginText.setVisible(false);
 	}
 }

@@ -2,20 +2,25 @@ package personal.viewcontroller;
 
 import personal.dao.CandidateDAOImpl;
 import personal.dao.ICandidateDAO;
+import personal.dao.IUserDAO;
+import personal.dao.UserDAOImpl;
 import personal.dao.exceptions.CandidateDAOException;
+import personal.dao.exceptions.UserDAOException;
 import personal.dto.CandidateReadOnlyDTO;
 import personal.dto.UserReadOnlyDTO;
 import personal.model.Candidate;
 import personal.model.User;
 import personal.service.CandidateServiceImpl;
 import personal.service.ICandidateService;
+import personal.service.IUserService;
+import personal.service.UserServiceImpl;
+import personal.service.exceptions.UserNotFoundException;
 import personal.service.util.DBUtil;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.awt.Font;
+import java.awt.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.Color;
 import java.awt.event.*;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -27,6 +32,8 @@ import javax.swing.border.BevelBorder;
 public class VotingFrame extends JFrame {
 	private final ICandidateDAO candidateDAO = new CandidateDAOImpl();
 	private final ICandidateService candidateService = new CandidateServiceImpl(candidateDAO);
+	private final IUserDAO userDAO = new UserDAOImpl();
+	private final IUserService userService = new UserServiceImpl(userDAO);
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -38,8 +45,8 @@ public class VotingFrame extends JFrame {
 	private JLabel userFirstnameLabel;
 	private JLabel userLastnameLabel;
 	private DefaultTableModel model;
-	private CandidateReadOnlyDTO selectedCandidateReadOnlyDTO;
-	private UserReadOnlyDTO voterReadOnlyDTO;
+	private CandidateReadOnlyDTO selectedCandidateReadOnlyDTO = null;
+	private UserReadOnlyDTO voterReadOnlyDTO = null;
 
 	public UserReadOnlyDTO getVoterReadOnlyDTO() {
 		return voterReadOnlyDTO;
@@ -80,27 +87,27 @@ public class VotingFrame extends JFrame {
 		userPanel.setBounds(322, 3, 172, 48);
 		contentPane.add(userPanel);
 		userPanel.setLayout(null);
-		
+
 		JLabel userIcon = new JLabel("");
 		userIcon.setBounds(10, 0, 38, 48);
 		userPanel.add(userIcon);
 		userIcon.setHorizontalAlignment(SwingConstants.LEFT);
 		userIcon.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(
 				"userIcon_x_small.png")));
-		
+
 		usernameLabel = new JLabel("Username");
 		usernameLabel.setFont(new Font("Dialog", Font.BOLD, 11));
 		usernameLabel.setBounds(50, 0, 120, 15);
 		userPanel.add(usernameLabel);
-		
+
 		userFirstnameLabel = new JLabel("Firstname");
 		userFirstnameLabel.setFont(new Font("Dialog", Font.PLAIN, 11));
-		userFirstnameLabel.setBounds(50, 17, 120, 15);
+		userFirstnameLabel.setBounds(50, 15, 120, 15);
 		userPanel.add(userFirstnameLabel);
-		
+
 		userLastnameLabel = new JLabel("Lastname");
 		userLastnameLabel.setFont(new Font("Dialog", Font.PLAIN, 11));
-		userLastnameLabel.setBounds(50, 33, 120, 15);
+		userLastnameLabel.setBounds(50, 30, 120, 15);
 		userPanel.add(userLastnameLabel);
 		
 		JScrollPane scrollPane = new JScrollPane();
@@ -124,50 +131,60 @@ public class VotingFrame extends JFrame {
 
 		model = (DefaultTableModel) candidatesTable.getModel();
 
-		JPanel panel = new JPanel();
-		panel.setBorder(new BevelBorder(BevelBorder.LOWERED, null,
-				null, null, null));
-		panel.setBounds(322, 84, 172, 171);
-		contentPane.add(panel);
-		panel.setLayout(null);
-		
-		JLabel lblNewLabel = new JLabel("Selected Candidate");
-		lblNewLabel.setForeground(new Color(52, 101, 164));
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel.setBounds(12, 5, 148, 15);
-		panel.add(lblNewLabel);
-		
+		JPanel selectedCandidatePanel = new JPanel();
+		selectedCandidatePanel.setBorder(new BevelBorder(BevelBorder.LOWERED,
+				null, null, null, null));
+		selectedCandidatePanel.setBounds(322, 84, 172, 171);
+		contentPane.add(selectedCandidatePanel);
+		selectedCandidatePanel.setLayout(null);
+
+		JLabel selectedCandidateLabel = new JLabel("Selected Candidate");
+		selectedCandidateLabel.setForeground(new Color(52, 101, 164));
+		selectedCandidateLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		selectedCandidateLabel.setBounds(12, 5, 148, 15);
+		selectedCandidatePanel.add(selectedCandidateLabel);
+
 		idText = new JTextField();
 		idText.setEditable(false);
 		idText.setBounds(12, 33, 49, 19);
-		panel.add(idText);
+		selectedCandidatePanel.add(idText);
 		idText.setColumns(10);
-		
+
 		firstnameText = new JTextField();
 		firstnameText.setEditable(false);
 		firstnameText.setColumns(10);
-		firstnameText.setBounds(12, 64, 148, 16);
-		panel.add(firstnameText);
-		
+		firstnameText.setBounds(12, 64, 148, 19);
+		selectedCandidatePanel.add(firstnameText);
+
 		lastnameText = new JTextField();
 		lastnameText.setEditable(false);
 		lastnameText.setColumns(10);
-		lastnameText.setBounds(12, 92, 148, 19);
-		panel.add(lastnameText);
+		lastnameText.setBounds(12, 95, 148, 19);
+		selectedCandidatePanel.add(lastnameText);
 		
 		JButton voteBtn = new JButton("Vote");
-//		voteBtn.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//
-//			}
-//		});
+		voteBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (selectedCandidateReadOnlyDTO == null || voterReadOnlyDTO == null) {
+					return;
+				}
+				try {
+					User user = userService.getUserByUsername(voterReadOnlyDTO.getUsername());
+					user.setHasVoted(1);
+					user.setVotedCid(selectedCandidateReadOnlyDTO.getCid());
+					userDAO.update(user);
+				} catch (UserNotFoundException | UserDAOException e1) {
+						e1.printStackTrace();
+				}
+			}
+		});
 		voteBtn.setForeground(new Color(52, 101, 164));
 		voteBtn.setBounds(30, 134, 117, 25);
-		panel.add(voteBtn);
+		selectedCandidatePanel.add(voteBtn);
 		
-		JLabel pickACandidateLabel = new JLabel("Select a candidate to vote.");
-		pickACandidateLabel.setBounds(16, 19, 243, 15);
-		contentPane.add(pickACandidateLabel);
+		JLabel selectACandidateLabel = new JLabel("Select a candidate to vote.");
+		selectACandidateLabel.setBounds(16, 19, 243, 15);
+		contentPane.add(selectACandidateLabel);
 	}
 
 	private void buildCandidatesTable() {
