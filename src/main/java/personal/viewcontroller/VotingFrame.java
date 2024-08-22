@@ -14,6 +14,7 @@ import personal.service.CandidateServiceImpl;
 import personal.service.ICandidateService;
 import personal.service.IUserService;
 import personal.service.UserServiceImpl;
+import personal.service.exceptions.CandidateNotFoundException;
 import personal.service.exceptions.UserNotFoundException;
 import personal.service.util.DBUtil;
 
@@ -37,6 +38,7 @@ public class VotingFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
+	private JTextArea selectACandidateText;
 	private JTable candidatesTable;
 	private JTextField idText;
 	private JTextField firstnameText;
@@ -47,6 +49,7 @@ public class VotingFrame extends JFrame {
 	private DefaultTableModel model;
 	private CandidateReadOnlyDTO selectedCandidateReadOnlyDTO = null;
 	private UserReadOnlyDTO voterReadOnlyDTO = null;
+	private JButton voteBtn;
 
 	public UserReadOnlyDTO getVoterReadOnlyDTO() {
 		return voterReadOnlyDTO;
@@ -64,11 +67,15 @@ public class VotingFrame extends JFrame {
 			@Override
 			public void windowOpened(WindowEvent e) {
 				buildCandidatesTable();
-				buildUserInformation(getVoterReadOnlyDTO());
+				buildUserInformation(voterReadOnlyDTO);
 			}
 			@Override
 			public void windowActivated(WindowEvent e) {
 				buildUserInformation(getVoterReadOnlyDTO());
+				if (checkIfAlreadyVoted(voterReadOnlyDTO)) {
+					candidatesTable.setEnabled(false);
+					selectACandidateText.setText("Your vote has been already successfully submitted.");
+				}
 			}
 		});
 		setResizable(false);
@@ -80,7 +87,17 @@ public class VotingFrame extends JFrame {
 
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
+
+		selectACandidateText = new JTextArea();
+		selectACandidateText.setEditable(false);
+		selectACandidateText.setWrapStyleWord(true);
+		selectACandidateText.setLineWrap(true);
+		selectACandidateText.setFont(new Font("Dialog", Font.PLAIN, 12));
+		selectACandidateText.setBackground(new Color(238, 238, 236));
+		selectACandidateText.setText("Select a candidate to vote.");
+		selectACandidateText.setBounds(16, 12, 294, 30);
+		contentPane.add(selectACandidateText);
+
 		JPanel userPanel = new JPanel();
 		userPanel.setBackground(new Color(238, 238, 236));
 		userPanel.setBorder(null);
@@ -118,9 +135,11 @@ public class VotingFrame extends JFrame {
 		candidatesTable.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				selectedCandidateReadOnlyDTO = createSelectedCandidateReadOnlyDTO();
-
-				buildSelectedCandidate(selectedCandidateReadOnlyDTO);
+				if (candidatesTable.isEnabled()) {
+					selectedCandidateReadOnlyDTO = createSelectedCandidateReadOnlyDTO();
+					buildSelectedCandidate(selectedCandidateReadOnlyDTO);
+					voteBtn.setEnabled(true);
+				}
 			}
 		});
 		scrollPane.setViewportView(candidatesTable);
@@ -161,30 +180,20 @@ public class VotingFrame extends JFrame {
 		lastnameText.setColumns(10);
 		lastnameText.setBounds(12, 95, 148, 19);
 		selectedCandidatePanel.add(lastnameText);
-		
-		JButton voteBtn = new JButton("Vote");
+
+		voteBtn = new JButton("Vote");
 		voteBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (selectedCandidateReadOnlyDTO == null || voterReadOnlyDTO == null) {
 					return;
 				}
-				try {
-					User user = userService.getUserByUsername(voterReadOnlyDTO.getUsername());
-					user.setHasVoted(1);
-					user.setVotedCid(selectedCandidateReadOnlyDTO.getCid());
-					userDAO.update(user);
-				} catch (UserNotFoundException | UserDAOException e1) {
-						e1.printStackTrace();
-				}
+				submitAVote(voterReadOnlyDTO, selectedCandidateReadOnlyDTO);
 			}
 		});
 		voteBtn.setForeground(new Color(52, 101, 164));
 		voteBtn.setBounds(30, 134, 117, 25);
+		voteBtn.setEnabled(false);
 		selectedCandidatePanel.add(voteBtn);
-		
-		JLabel selectACandidateLabel = new JLabel("Select a candidate to vote.");
-		selectACandidateLabel.setBounds(16, 19, 243, 15);
-		contentPane.add(selectACandidateLabel);
 	}
 
 	private void buildCandidatesTable() {
@@ -247,5 +256,38 @@ public class VotingFrame extends JFrame {
 		usernameLabel.setText(userReadOnlyDTO.getUsername());
 		userFirstnameLabel.setText(userReadOnlyDTO.getFirstname());
 		userLastnameLabel.setText(userReadOnlyDTO.getLastname());
+	}
+
+	private void submitAVote(UserReadOnlyDTO userReadOnlyDTO, CandidateReadOnlyDTO candidateReadOnlyDTO) {
+		try {
+			int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to submit your" +
+					" vote? This action cannot be undone.", "Vote verification", JOptionPane.YES_NO_OPTION);
+			if (response == JOptionPane.YES_OPTION) {
+				userService.voteACandidate(userReadOnlyDTO, candidateReadOnlyDTO);
+				JOptionPane.showMessageDialog(null, "Thank you for voting!" +
+						" Your vote has been successfully submitted.", "Successful Voting", JOptionPane.INFORMATION_MESSAGE);
+				selectACandidateText.setText("Your vote has been successfully submitted.");
+				voteBtn.setEnabled(false);
+				candidatesTable.setEnabled(false);
+			}
+		} catch (CandidateNotFoundException e1) {
+			JOptionPane.showMessageDialog(null, "Candidate does not exist",
+					"Error in Voting", JOptionPane.ERROR_MESSAGE);
+		} catch (UserNotFoundException e2) {
+			JOptionPane.showMessageDialog(null, "Voter does not exist.",
+					"Error in Voting", JOptionPane.ERROR_MESSAGE);
+		} catch (UserDAOException | CandidateDAOException e3) {
+			JOptionPane.showMessageDialog(null, "Error in Database",
+					"Error in Voting", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	private boolean checkIfAlreadyVoted(UserReadOnlyDTO userReadOnlyDTO) {
+		if (userReadOnlyDTO == null) return false;
+		try {
+			 return userService.checkIfUserHasVoted(userReadOnlyDTO.getUsername());
+		} catch (UserNotFoundException | UserDAOException e) {
+			return false;
+		}
 	}
 }

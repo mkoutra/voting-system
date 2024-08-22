@@ -17,4 +17,10 @@ class CandidateDAOImplTest {
         System.out.println(candidates);
         assertEquals(3, candidates.get(0).getCid());
     }
+
+    @Test
+    void candidateIdExists() throws CandidateDAOException {
+        assertTrue(candidateDAO.cidExists(2));
+        assertFalse(candidateDAO.cidExists(45));
+    }
 }

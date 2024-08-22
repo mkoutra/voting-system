@@ -14,6 +14,25 @@ import java.util.List;
 
 public class CandidateDAOImpl implements ICandidateDAO {
     @Override
+    public boolean cidExists(Integer cid) throws CandidateDAOException {
+        String sql = "SELECT COUNT(1) FROM candidates WHERE cid = ?;";
+        try(Connection connection = DBUtil.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            int candidateExists = 0;
+            ps.setInt(1, cid);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                candidateExists = rs.getInt(1);
+            }
+
+            return candidateExists == 1;
+        } catch (SQLException e) {
+            throw new CandidateDAOException("SQL error in checking if candidate ID exists");
+        }
+    }
+
+    @Override
     public List<Candidate> getAllCandidates() throws CandidateDAOException {
         final List<Candidate> candidates = new ArrayList<>();
         Candidate candidate = null;

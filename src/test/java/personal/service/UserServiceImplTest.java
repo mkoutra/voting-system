@@ -4,7 +4,10 @@ import org.junit.jupiter.api.Test;
 import personal.dao.IUserDAO;
 import personal.dao.UserDAOImpl;
 import personal.dao.exceptions.UserDAOException;
+import personal.dto.CandidateReadOnlyDTO;
 import personal.dto.UserInsertDTO;
+import personal.dto.UserReadOnlyDTO;
+import personal.model.User;
 
 import java.util.Date;
 
@@ -20,5 +23,21 @@ class UserServiceImplTest {
                 "pass", "passo");
 
         userService.insertUser(insertDTO);
+    }
+
+    @Test
+    void voteACandidate() {
+        UserReadOnlyDTO userReadOnlyDTO = new UserReadOnlyDTO("taxiDriver", "M", "K");
+        CandidateReadOnlyDTO candidateReadOnlyDTO = new CandidateReadOnlyDTO(3, "random", "random");
+
+        try {
+            userService.voteACandidate(userReadOnlyDTO, candidateReadOnlyDTO);
+            User afterVotingUser = userService.getUserByUsername(userReadOnlyDTO.getUsername());
+            assertEquals("taxiDriver", afterVotingUser.getUsername());
+            assertEquals(3, afterVotingUser.getVotedCid());
+            assertEquals(1, afterVotingUser.getHasVoted());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

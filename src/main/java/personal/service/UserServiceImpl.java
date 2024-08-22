@@ -1,10 +1,16 @@
 package personal.service;
 
 import org.mindrot.jbcrypt.BCrypt;
+import personal.dao.CandidateDAOImpl;
+import personal.dao.ICandidateDAO;
 import personal.dao.IUserDAO;
+import personal.dao.exceptions.CandidateDAOException;
 import personal.dao.exceptions.UserDAOException;
+import personal.dto.CandidateReadOnlyDTO;
 import personal.dto.UserInsertDTO;
+import personal.dto.UserReadOnlyDTO;
 import personal.model.User;
+import personal.service.exceptions.CandidateNotFoundException;
 import personal.service.exceptions.UserNotFoundException;
 
 public class UserServiceImpl implements IUserService {
@@ -50,6 +56,37 @@ public class UserServiceImpl implements IUserService {
         }
         User user = userDAO.getByUsername(username);
         return BCrypt.checkpw(plainPassword, user.getPassword());
+    }
+
+    @Override
+    public void voteACandidate(UserReadOnlyDTO userReadOnlyDTO, CandidateReadOnlyDTO candidateReadOnlyDTO)
+            throws CandidateNotFoundException, UserNotFoundException, UserDAOException, CandidateDAOException {
+        ICandidateDAO candidateDAO = new CandidateDAOImpl();
+        try {
+            if (!userDAO.usernameExists(userReadOnlyDTO.getUsername())) {
+                throw new UserNotFoundException("User: " + userReadOnlyDTO.getUsername() + " does not exist.");
+            }
+            if (!candidateDAO.cidExists(candidateReadOnlyDTO.getCid())) {
+                throw new CandidateNotFoundException("Candidate with id: " + candidateReadOnlyDTO.getCid() + " does not exist.");
+            }
+
+            User voter = userDAO.getByUsername(userReadOnlyDTO.getUsername());
+            voter.setHasVoted(1);
+            voter.setVotedCid(candidateReadOnlyDTO.getCid());
+            userDAO.update(voter);
+        } catch (CandidateDAOException | UserDAOException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @Override
+    public boolean checkIfUserHasVoted(String username) throws UserNotFoundException, UserDAOException {
+        if (!userDAO.usernameExists(username)) {
+            throw new UserNotFoundException("Username: " + username + " does not exist.");
+        }
+        User user = userDAO.getByUsername(username);
+        return user.getHasVoted() == 1;
     }
 
     private static User mapUserInsertDTOToUser(UserInsertDTO dto) {
