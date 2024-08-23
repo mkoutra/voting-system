@@ -9,6 +9,7 @@ import personal.dao.exceptions.UserDAOException;
 import personal.dto.CandidateReadOnlyDTO;
 import personal.dto.UserReadOnlyDTO;
 import personal.model.Candidate;
+import personal.model.User;
 import personal.service.CandidateServiceImpl;
 import personal.service.ICandidateService;
 import personal.service.IUserService;
@@ -75,6 +76,7 @@ public class VotingFrame extends JFrame {
 				buildUserInformation(getVoterReadOnlyDTO());
 				if (checkIfAlreadyVoted(voterReadOnlyDTO)) {
 					candidatesTable.setEnabled(false);
+					viewVoteBtn.setEnabled(true);
 					selectACandidateText.setText("Your vote has been already successfully submitted.");
 				}
 			}
@@ -202,7 +204,18 @@ public class VotingFrame extends JFrame {
 		optionsPanel.setLayout(null);
 
 		viewVoteBtn = new JButton("View your Vote");
+		viewVoteBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CandidateReadOnlyDTO candidateReadOnlyDTO = getVotedCandidate(voterReadOnlyDTO);
+				if (candidateReadOnlyDTO == null) return;
+				String message = "You have voted for: " + candidateReadOnlyDTO.getFirstname() + " "
+						+ candidateReadOnlyDTO.getLastname() + " (id: " + candidateReadOnlyDTO.getCid() + ")";
+				JOptionPane.showMessageDialog(null, message, "Voting Information", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
 		viewVoteBtn.setBounds(0, 0, 141, 25);
+		viewVoteBtn.setEnabled(false);
 		optionsPanel.add(viewVoteBtn);
 		viewVoteBtn.setForeground(new Color(52, 101, 164));
 
@@ -310,5 +323,27 @@ public class VotingFrame extends JFrame {
 		} catch (UserNotFoundException | UserDAOException e) {
 			return false;
 		}
+	}
+
+	private CandidateReadOnlyDTO getVotedCandidate(UserReadOnlyDTO userReadOnlyDTO) {
+		if (!checkIfAlreadyVoted(userReadOnlyDTO)) return null;
+		try {
+			User user = mapReadOnlyDTOToUser(userReadOnlyDTO);
+			Candidate candidate = candidateService.getCandidateById(user.getVotedCid());
+			return mapCandidateToReadOnlyDTO(candidate);
+		} catch (UserNotFoundException | UserDAOException | CandidateNotFoundException | CandidateDAOException e) {
+			JOptionPane.showMessageDialog(null, "Error retrieving vote",
+					"Vote error", JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
+	}
+
+	private User mapReadOnlyDTOToUser(UserReadOnlyDTO userReadOnlyDTO) throws UserNotFoundException, UserDAOException {
+		if (userReadOnlyDTO == null) return null;
+		return userService.getUserByUsername(userReadOnlyDTO.getUsername());
+	}
+
+	private CandidateReadOnlyDTO mapCandidateToReadOnlyDTO(Candidate candidate) {
+		return new CandidateReadOnlyDTO(candidate.getCid(), candidate.getFirstname(), candidate.getLastname());
 	}
 }
