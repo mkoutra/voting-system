@@ -69,16 +69,28 @@ public class VotingFrame extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent e) {
-				buildCandidatesTable();
 				buildUserInformation(voterReadOnlyDTO);
+
+				// Check if user has already voted.
+				if (checkIfAlreadyVoted(voterReadOnlyDTO)) {
+					viewVoteBtn.setEnabled(true);
+					selectACandidateText.setText("Your vote has been already successfully submitted.");
+				} else {
+					buildCandidatesTable();
+				}
 			}
+
 			@Override
 			public void windowActivated(WindowEvent e) {
 				buildUserInformation(getVoterReadOnlyDTO());
+
 				if (checkIfAlreadyVoted(voterReadOnlyDTO)) {
 					candidatesTable.setEnabled(false);
 					viewVoteBtn.setEnabled(true);
 					selectACandidateText.setText("Your vote has been already successfully submitted.");
+				} else {
+					buildCandidatesTable();
+					candidatesTable.setEnabled(true);
 				}
 			}
 		});
@@ -226,6 +238,19 @@ public class VotingFrame extends JFrame {
 		viewVoteBtn.setForeground(new Color(52, 101, 164));
 
 		logoutBtn = new JButton("Logout");
+		logoutBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to log out?",
+						"Logout Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				if (response == JOptionPane.YES_OPTION) {
+					resetWindow();
+					App.getMainMenuFrame().setEnabled(true);
+					App.getMainMenuFrame().setVisible(true);
+					dispose();
+				}
+			}
+		});
 		logoutBtn.setBounds(0, 73, 141, 25);
 		optionsPanel.add(logoutBtn);
 		logoutBtn.setForeground(new Color(52, 101, 164));
@@ -253,10 +278,7 @@ public class VotingFrame extends JFrame {
 				readOnlyDTOCandidates.add(mapCandidateToCandidateReadOnlyDTO(candidate));
 			}
 
-			// Remove table rows
-			for (int i = model.getRowCount() - 1; i >= 0; i--) {
-				model.removeRow(i);
-			}
+			cleanTable();
 
 			// Add to model
 			for (CandidateReadOnlyDTO dto : readOnlyDTOCandidates) {
@@ -357,5 +379,36 @@ public class VotingFrame extends JFrame {
 
 	private CandidateReadOnlyDTO mapCandidateToReadOnlyDTO(Candidate candidate) {
 		return new CandidateReadOnlyDTO(candidate.getCid(), candidate.getFirstname(), candidate.getLastname());
+	}
+
+	private void cleanTable() {
+		for (int row = model.getRowCount() - 1; row >= 0; row--) {
+			model.removeRow(row);
+		}
+	}
+
+	private void cleanSelectedUser() {
+		idText.setText("");
+		firstnameText.setText("");
+		lastnameText.setText("");
+
+		selectedCandidateReadOnlyDTO = null;
+	}
+
+	private void cleanUserInformation() {
+		usernameLabel.setText("");
+		userFirstnameLabel.setText("");
+		userLastnameLabel.setText("");
+
+		voterReadOnlyDTO = null;
+	}
+
+	private void resetWindow() {
+		cleanTable();
+		cleanSelectedUser();
+		cleanUserInformation();
+		voteBtn.setEnabled(false);
+		viewVoteBtn.setEnabled(false);
+		selectACandidateText.setText("Select a candidate to vote.");
 	}
 }
