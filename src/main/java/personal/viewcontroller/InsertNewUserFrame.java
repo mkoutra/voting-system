@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import com.toedter.calendar.JDateChooser;
+import personal.App;
 import personal.dao.IUserDAO;
 import personal.dao.UserDAOImpl;
 import personal.dao.exceptions.UserDAOException;
@@ -49,10 +50,21 @@ public class InsertNewUserFrame extends JFrame {
 			public void windowOpened(WindowEvent e) {
 				cleanAll();
 			}
+
+			@Override
+			public void windowActivated(WindowEvent e) {
+				cleanAll();
+			}
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				App.getMainMenuFrame().setEnabled(true);
+				dispose();
+			}
 		});
 		setResizable(false);
 		setTitle("Sign up");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 442, 436);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -309,14 +321,17 @@ public class InsertNewUserFrame extends JFrame {
 					return;
 				}
 
-				// Insert to DB and clean text and labels
+				// Insert to DB, clean texts and close window
 				try {
 					userService.insertUser(insertDTO);
-					cleanAll();
 
 					JOptionPane.showMessageDialog(null,
 							"Welcome " + insertDTO.getUsername() + "!\nYour account has been created successfully.",
 							"Successful Insertion", JOptionPane.INFORMATION_MESSAGE);
+
+					App.getMainMenuFrame().setEnabled(true);
+					cleanAll();
+					dispose();
 				} catch (UserDAOException e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(null, "User insertion error",

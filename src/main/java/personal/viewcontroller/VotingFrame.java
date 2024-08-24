@@ -93,10 +93,15 @@ public class VotingFrame extends JFrame {
 					candidatesTable.setEnabled(true);
 				}
 			}
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				logoutBtn.doClick();
+			}
 		});
 		setResizable(false);
 		setTitle("Voting");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 506, 424);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -258,8 +263,8 @@ public class VotingFrame extends JFrame {
 		resultsBtn = new JButton("Results");
 		resultsBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				App.getVotingWindow().setEnabled(false);
 				App.getVotingResultsFrame().setVisible(true);
+				App.getVotingWindow().setEnabled(false);
 			}
 		});
 		resultsBtn.setBounds(0, 36, 141, 25);

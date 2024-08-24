@@ -54,6 +54,12 @@ public class VotingResultsFrame extends JFrame {
 				sortCandidatesTable(0);
 				buildCandidatesTable(candidatesWithVotesReadOnlyDTOs);
 			}
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				App.getVotingWindow().setEnabled(true);
+				dispose();
+			}
 		});
 		setResizable(false);
 		setTitle("Voting Results");
