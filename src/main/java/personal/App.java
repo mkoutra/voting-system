@@ -30,7 +30,7 @@ public class App {
                     votingFrame.setVisible(false);
 
                     votingResultsFrame.setLocationRelativeTo(null);
-                    votingResultsFrame.setVisible(true);
+                    votingResultsFrame.setVisible(false);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -1,5 +1,6 @@
 package personal.viewcontroller;
 
+import personal.App;
 import personal.dao.CandidateDAOImpl;
 import personal.dao.ICandidateDAO;
 import personal.dao.IUserDAO;
@@ -225,6 +226,12 @@ public class VotingFrame extends JFrame {
 		logoutBtn.setForeground(new Color(52, 101, 164));
 
 		resultsBtn = new JButton("Results");
+		resultsBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				App.getVotingWindow().setEnabled(false);
+				App.getVotingResultsFrame().setVisible(true);
+			}
+		});
 		resultsBtn.setBounds(0, 36, 141, 25);
 		optionsPanel.add(resultsBtn);
 		resultsBtn.setForeground(new Color(52, 101, 164));

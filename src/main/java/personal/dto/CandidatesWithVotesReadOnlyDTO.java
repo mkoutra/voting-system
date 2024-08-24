@@ -49,11 +49,7 @@ public class CandidatesWithVotesReadOnlyDTO {
 
     @Override
     public String toString() {
-        return "CandidatesWithVotesReadOnlyDTO{" +
-                "cid=" + cid +
-                ", firstname='" + firstname + '\'' +
-                ", lastname='" + lastname + '\'' +
-                ", totalVotes=" + totalVotes +
-                '}';
+        return cid.toString() + "," + firstname + ","
+                + lastname + "," + totalVotes.toString();
     }
 }

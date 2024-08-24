@@ -3,10 +3,15 @@ package personal.service;
 import personal.dao.ICandidateDAO;
 import personal.dao.exceptions.CandidateDAOException;
 import personal.dto.CandidateReadOnlyDTO;
+import personal.dto.CandidatesWithVotesReadOnlyDTO;
 import personal.model.Candidate;
+import personal.service.exceptions.CandidateIOException;
 import personal.service.exceptions.CandidateNotFoundException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +51,16 @@ public class CandidateServiceImpl implements ICandidateService {
     }
 
     @Override
-    public void saveVotingResults(File file) {
-        return;
+    public void saveVotingResults(List<CandidatesWithVotesReadOnlyDTO> candidatesDTOs, File file)
+            throws CandidateIOException {
+        if (file == null) return;
+        try (PrintWriter pw = new PrintWriter(file)) {
+            pw.println("ID,First name,Last name,Total Votes");
+            candidatesDTOs.stream()
+                          .sorted(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getCid))
+                          .forEach(pw::println);
+        } catch (FileNotFoundException e) {
+            throw new CandidateIOException("File: " + file + " not found.");
+        }
     }
 }

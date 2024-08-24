@@ -1,28 +1,25 @@
 package personal.viewcontroller;
 
+import personal.App;
 import personal.dao.CandidateDAOImpl;
 import personal.dao.ICandidateDAO;
 import personal.dao.exceptions.CandidateDAOException;
-import personal.dto.CandidateReadOnlyDTO;
 import personal.dto.CandidatesWithVotesReadOnlyDTO;
 import personal.model.Candidate;
 import personal.service.CandidateServiceImpl;
 import personal.service.ICandidateService;
+import personal.service.exceptions.CandidateIOException;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.Color;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.reflect.Method;
 import java.util.*;
-import java.util.function.Function;
 
 public class VotingResultsFrame extends JFrame {
 	private final ICandidateDAO candidateDAO = new CandidateDAOImpl();
@@ -40,7 +37,7 @@ public class VotingResultsFrame extends JFrame {
 	 */
 	public VotingResultsFrame() {
 		setTitle("Voting Results");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 525, 275);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -81,16 +78,18 @@ public class VotingResultsFrame extends JFrame {
 		saveResultsBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileChooser = new JFileChooser();
-				int num = fileChooser.showSaveDialog(null);
-				File file = fileChooser.getSelectedFile();
-				System.out.println(num);
-				System.out.println(file);
-				try {
-					PrintWriter pw = new PrintWriter(new FileWriter(file));
-					pw.println("Test");
-					pw.close();
-				} catch (IOException e1) {
-					e1.printStackTrace();
+				fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("CSV Files", "csv"));
+
+				if (fileChooser.showSaveDialog(contentPane) == JFileChooser.APPROVE_OPTION) {
+					File file = fixFileExtension(fileChooser.getSelectedFile());
+					try {
+						Map<Candidate, Integer> candidatesWithVotes = candidateService.getAllCandidatesWithVotes();
+						List<CandidatesWithVotesReadOnlyDTO> readOnlyDTOs = mapToCandidatesWithVotesReadOnlyDTO(candidatesWithVotes);
+						candidateService.saveVotingResults(readOnlyDTOs, file);
+					} catch (CandidateIOException | CandidateDAOException e1) {
+						JOptionPane.showMessageDialog(contentPane, "An error occurred while saving the file",
+								"File Saving Error", JOptionPane.ERROR_MESSAGE);
+					}
 				}
 			}
 		});
@@ -99,6 +98,13 @@ public class VotingResultsFrame extends JFrame {
 		saveResultsBtn.setForeground(new Color(52, 101, 164));
 		
 		JButton closeBtn = new JButton("Close");
+		closeBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				App.getVotingWindow().setEnabled(true);
+				dispose();
+			}
+		});
 		closeBtn.setBounds(0, 35, 125, 25);
 		buttonsPanel.add(closeBtn);
 		closeBtn.setForeground(new Color(52, 101, 164));
@@ -108,11 +114,11 @@ public class VotingResultsFrame extends JFrame {
 		contentPane.add(panel);
 		panel.setLayout(null);
 		
-		JLabel lblNewLabel = new JLabel("Sort By");
-		lblNewLabel.setFont(new Font("Dialog", Font.BOLD, 12));
-		lblNewLabel.setBounds(0, 0, 51, 15);
-		panel.add(lblNewLabel);
-		lblNewLabel.setForeground(new Color(52, 101, 164));
+		JLabel sortByLabel = new JLabel("Sort By");
+		sortByLabel.setFont(new Font("Dialog", Font.BOLD, 12));
+		sortByLabel.setBounds(0, 0, 51, 15);
+		panel.add(sortByLabel);
+		sortByLabel.setForeground(new Color(52, 101, 164));
 		
 		comboBox = new JComboBox();
 		comboBox.setBounds(0, 20, 125, 24);
@@ -140,7 +146,6 @@ public class VotingResultsFrame extends JFrame {
 			for (int i = resultsModel.getRowCount() - 1; i >= 0; i--) {
 				resultsModel.removeRow(i);
 			}
-
 
 			// Sort candidates by sort Index
 			switch (sortByIndex) {
@@ -190,5 +195,13 @@ public class VotingResultsFrame extends JFrame {
 		}
 
 		return candidatesWithVotesArray;
+	}
+
+	private File fixFileExtension(File file) {
+		File correctExtensionFile = file;
+		if (!(file.getAbsolutePath().endsWith(".csv") || file.getAbsolutePath().endsWith(".txt"))) {
+			correctExtensionFile = new File(file.getAbsolutePath() + ".csv");
+		}
+		return correctExtensionFile;
 	}
 }

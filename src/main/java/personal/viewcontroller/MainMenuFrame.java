@@ -18,6 +18,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import javax.swing.border.BevelBorder;
 
 public class MainMenuFrame extends JFrame {
@@ -29,6 +31,7 @@ public class MainMenuFrame extends JFrame {
 	private JTextField usernameText;
 	private JPasswordField passwordField;
 	private JTextArea failedLoginText;
+	private JButton submitBtn;
 
 	/**
 	 * Create the frame.
@@ -63,6 +66,14 @@ public class MainMenuFrame extends JFrame {
 		usernameLabel.setForeground(new Color(52, 101, 164));
 		
 		usernameText = new JTextField();
+		usernameText.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					submitBtn.doClick();
+				}
+			}
+		});
 		usernameText.setBounds(98, 42, 201, 25);
 		panel.add(usernameText);
 		usernameText.setColumns(10);
@@ -73,6 +84,14 @@ public class MainMenuFrame extends JFrame {
 		passwordLabel.setForeground(new Color(52, 101, 164));
 		
 		passwordField = new JPasswordField();
+		passwordField.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					submitBtn.doClick();
+				}
+			}
+		});
 		passwordField.setBounds(98, 76, 201, 25);
 		panel.add(passwordField);
 		passwordField.setForeground(new Color(52, 101, 164));
@@ -98,7 +117,7 @@ public class MainMenuFrame extends JFrame {
 		panel_1.add(createAccountLabel);
 		createAccountLabel.setVerticalAlignment(SwingConstants.TOP);
 
-		JButton submitBtn = new JButton("Sign in");
+		submitBtn = new JButton("Sign in");
 		submitBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				UserLoginDTO userLoginDTO = createUserLoginDTO();
@@ -109,7 +128,6 @@ public class MainMenuFrame extends JFrame {
 					failedLoginText.setVisible(true);
 					return;
 				}
-
 
 				// Activate Voting Window and close current frame.
 				cleanTexts();
