@@ -135,7 +135,12 @@ public class VotingFrame extends JFrame {
 		scrollPane.setBounds(9, 62, 301, 196);
 		contentPane.add(scrollPane);
 		
-		candidatesTable = new JTable();
+		candidatesTable = new JTable() {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			};
+		};
 		candidatesTable.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {

@@ -18,6 +18,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.*;
 
@@ -31,13 +33,28 @@ public class VotingResultsFrame extends JFrame {
 	private DefaultTableModel resultsModel;
 	private DefaultComboBoxModel sortByModel;
 	private JComboBox comboBox;
+	private List<CandidatesWithVotesReadOnlyDTO> candidatesWithVotesReadOnlyDTOs;
 
 	/**
 	 * Create the frame.
 	 */
 	public VotingResultsFrame() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent e) {
+				candidatesWithVotesReadOnlyDTOs = createCandidatesWithVotesReadOnlyDTO();
+				sortCandidatesTable(0);
+				buildCandidatesTable(candidatesWithVotesReadOnlyDTOs);
+			}
+			@Override
+			public void windowActivated(WindowEvent e) {
+				candidatesWithVotesReadOnlyDTOs = createCandidatesWithVotesReadOnlyDTO();
+				sortCandidatesTable(0);
+				buildCandidatesTable(candidatesWithVotesReadOnlyDTOs);
+			}
+		});
 		setTitle("Voting Results");
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 525, 275);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -49,7 +66,12 @@ public class VotingResultsFrame extends JFrame {
 		scrollPane.setBounds(10, 46, 366, 181);
 		contentPane.add(scrollPane);
 		
-		resultsTable = new JTable();
+		resultsTable = new JTable() {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
 		resultsTable.setModel(new DefaultTableModel(
 			new Object[][] {},
 			new String[] {"ID", "First Name", "Last Name", "Total Votes"}
@@ -73,7 +95,7 @@ public class VotingResultsFrame extends JFrame {
 		buttonsPanel.setBounds(384, 167, 125, 60);
 		contentPane.add(buttonsPanel);
 		buttonsPanel.setLayout(null);
-		
+
 		JButton saveResultsBtn = new JButton("Save Results");
 		saveResultsBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -130,55 +152,91 @@ public class VotingResultsFrame extends JFrame {
 		comboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int optionInt = comboBox.getSelectedIndex();
-				buildCandidatesTable(optionInt);
+				sortCandidatesTable(optionInt);
+				buildCandidatesTable(candidatesWithVotesReadOnlyDTOs);
 			}
 		});
-
 	}
 
-	private void buildCandidatesTable(Integer sortByIndex) {
-		try {
-			Map<Candidate, Integer> candidatesWithVotes = candidateService.getAllCandidatesWithVotes();
-			List<CandidatesWithVotesReadOnlyDTO> readOnlyDTOs = mapToCandidatesWithVotesReadOnlyDTO(candidatesWithVotes);
-			Vector<String> vector;
+	private void buildCandidatesTable(List<CandidatesWithVotesReadOnlyDTO> readOnlyDTOs) {
+		Vector<String> vector;
 
-			// Remove table rows
-			for (int i = resultsModel.getRowCount() - 1; i >= 0; i--) {
-				resultsModel.removeRow(i);
-			}
+		// Remove table rows
+		for (int i = resultsModel.getRowCount() - 1; i >= 0; i--) {
+			resultsModel.removeRow(i);
+		}
 
-			// Sort candidates by sort Index
-			switch (sortByIndex) {
-				case 0:
-					readOnlyDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getTotalVotes));
-					break;
-				case 1:
-					readOnlyDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getFirstname));
-					break;
-				case 2:
-					readOnlyDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getLastname));
-					break;
-				case 3:
-					readOnlyDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getCid));
-					break;
-			}
+		// Add to model
+		for (CandidatesWithVotesReadOnlyDTO dto : readOnlyDTOs) {
+			vector = new Vector<>(4);
+			vector.add(Integer.toString(dto.getCid()));
+			vector.add(dto.getFirstname());
+			vector.add(dto.getLastname());
+			vector.add(String.valueOf(dto.getTotalVotes()));
 
-			// Add to model
-			for (CandidatesWithVotesReadOnlyDTO dto : readOnlyDTOs) {
-				vector = new Vector<>(4);
-				vector.add(Integer.toString(dto.getCid()));
-				vector.add(dto.getFirstname());
-				vector.add(dto.getLastname());
-				vector.add(String.valueOf(dto.getTotalVotes()));
-
-				resultsModel.addRow(vector);
-			}
-
-		} catch (CandidateDAOException e1) {
-			JOptionPane.showMessageDialog(null, "Unable to create candidate table.",
-					"Table error", JOptionPane.ERROR_MESSAGE);
+			resultsModel.addRow(vector);
 		}
 	}
+
+	private void sortCandidatesTable(Integer sortByIndex) {
+		switch (sortByIndex) {
+			case 0:
+				candidatesWithVotesReadOnlyDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getTotalVotes).reversed());
+				break;
+			case 1:
+				candidatesWithVotesReadOnlyDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getFirstname));
+				break;
+			case 2:
+				candidatesWithVotesReadOnlyDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getLastname));
+				break;
+			case 3:
+				candidatesWithVotesReadOnlyDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getCid));
+				break;
+		}
+	}
+
+//	private void buildCandidatesTable(List<CandidatesWithVotesReadOnlyDTO> readOnlyDTOs ,Integer sortByIndex) {
+////		try {
+////			Map<Candidate, Integer> candidatesWithVotes = candidateService.getAllCandidatesWithVotes();
+////			List<CandidatesWithVotesReadOnlyDTO> readOnlyDTOs = mapToCandidatesWithVotesReadOnlyDTO(candidatesWithVotes);
+//			Vector<String> vector;
+//
+//			// Remove table rows
+//			for (int i = resultsModel.getRowCount() - 1; i >= 0; i--) {
+//				resultsModel.removeRow(i);
+//			}
+//
+//			// Sort candidates by sort Index
+//			switch (sortByIndex) {
+//				case 0:
+//					readOnlyDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getTotalVotes));
+//					break;
+//				case 1:
+//					readOnlyDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getFirstname));
+//					break;
+//				case 2:
+//					readOnlyDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getLastname));
+//					break;
+//				case 3:
+//					readOnlyDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getCid));
+//					break;
+//			}
+//
+//			// Add to model
+//			for (CandidatesWithVotesReadOnlyDTO dto : readOnlyDTOs) {
+//				vector = new Vector<>(4);
+//				vector.add(Integer.toString(dto.getCid()));
+//				vector.add(dto.getFirstname());
+//				vector.add(dto.getLastname());
+//				vector.add(String.valueOf(dto.getTotalVotes()));
+//
+//				resultsModel.addRow(vector);
+//			}
+////		} catch (CandidateDAOException e1) {
+////			JOptionPane.showMessageDialog(null, "Unable to create candidate table.",
+////					"Table error", JOptionPane.ERROR_MESSAGE);
+////		}
+//	}
 
 	private List<CandidatesWithVotesReadOnlyDTO> mapToCandidatesWithVotesReadOnlyDTO(Map<Candidate, Integer> candidatesWithVotes) {
 		List<CandidatesWithVotesReadOnlyDTO> candidatesWithVotesArray = new ArrayList<>();
@@ -195,6 +253,17 @@ public class VotingResultsFrame extends JFrame {
 		}
 
 		return candidatesWithVotesArray;
+	}
+
+	private List<CandidatesWithVotesReadOnlyDTO> createCandidatesWithVotesReadOnlyDTO() {
+		try {
+			Map<Candidate, Integer> candidatesWithVotes = candidateService.getAllCandidatesWithVotes();
+			return mapToCandidatesWithVotesReadOnlyDTO(candidatesWithVotes);
+		} catch (CandidateDAOException e) {
+			JOptionPane.showMessageDialog(null, "Error in retrieving the results",
+					"Results table error", JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
 	}
 
 	private File fixFileExtension(File file) {
