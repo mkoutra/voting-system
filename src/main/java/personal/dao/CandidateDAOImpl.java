@@ -1,6 +1,7 @@
 package personal.dao;
 
 import personal.dao.exceptions.CandidateDAOException;
+import personal.dao.exceptions.UserDAOException;
 import personal.model.Candidate;
 import personal.service.util.DBUtil;
 
@@ -14,6 +15,58 @@ import java.util.List;
 import java.util.Map;
 
 public class CandidateDAOImpl implements ICandidateDAO {
+    @Override
+    public Candidate insert(Candidate candidate) throws CandidateDAOException {
+        String sql = "INSERT INTO candidate (firstname, lastname) VALUES (?, ?)";
+
+        try (Connection connection = DBUtil.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, candidate.getFirstname());
+            ps.setString(2, candidate.getLastname());
+
+            ps.executeUpdate();
+
+            return candidate;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new CandidateDAOException("SQL error in insert candidate: " + candidate);
+        }
+    }
+
+    @Override
+    public Candidate update(Candidate candidate) throws CandidateDAOException {
+        String sql = "UPDATE candidates SET firstname = ?, lastname = ? WHERE cid = ?;";
+
+        try (Connection connection = DBUtil.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, candidate.getFirstname());
+            ps.setString(2, candidate.getLastname());
+            ps.setInt(3, candidate.getCid());
+
+            ps.executeUpdate();
+
+            return candidate;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new CandidateDAOException("SQL error in update candidate: " + candidate);
+        }
+    }
+
+    @Override
+    public void delete(Integer cid) throws CandidateDAOException {
+        String sql = "DELETE FROM candidates WHERE cid = ?";
+
+        try (Connection connection = DBUtil.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, cid);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new CandidateDAOException("SQL error in delete candidate with cid: " + cid);
+        }
+    }
+
     @Override
     public boolean cidExists(Integer cid) throws CandidateDAOException {
         String sql = "SELECT COUNT(1) FROM candidates WHERE cid = ?;";

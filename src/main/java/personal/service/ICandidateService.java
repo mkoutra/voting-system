@@ -1,7 +1,9 @@
 package personal.service;
 
 import personal.dao.exceptions.CandidateDAOException;
+import personal.dto.CandidateInsertDTO;
 import personal.dto.CandidateReadOnlyDTO;
+import personal.dto.CandidateUpdateDTO;
 import personal.dto.CandidatesWithVotesReadOnlyDTO;
 import personal.model.Candidate;
 import personal.service.exceptions.CandidateIOException;
@@ -12,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 public interface ICandidateService {
+    void insertCandidate(CandidateInsertDTO dto) throws CandidateDAOException;
+    void updateCandidate(CandidateUpdateDTO dto) throws CandidateNotFoundException, CandidateDAOException;
+    void deleteCandidate(Integer cid) throws CandidateNotFoundException, CandidateDAOException;
     List<Candidate> getAllCandidates() throws CandidateDAOException;
     boolean candidateExistsById(CandidateReadOnlyDTO candidateReadOnlyDTO) throws CandidateDAOException;
     Candidate getCandidateById(Integer cid) throws CandidateNotFoundException, CandidateDAOException;

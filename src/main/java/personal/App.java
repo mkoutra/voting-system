@@ -1,9 +1,7 @@
 package personal;
 
-import personal.viewcontroller.InsertNewUserFrame;
-import personal.viewcontroller.MainMenuFrame;
-import personal.viewcontroller.VotingFrame;
-import personal.viewcontroller.VotingResultsFrame;
+import personal.service.exceptions.CandidateNotFoundException;
+import personal.viewcontroller.*;
 
 import java.awt.EventQueue;
 
@@ -12,6 +10,7 @@ public class App {
     private final static InsertNewUserFrame insertNewUserFrame = new InsertNewUserFrame();
     private final static VotingFrame votingFrame = new VotingFrame();
     private final static VotingResultsFrame votingResultsFrame = new VotingResultsFrame();
+    private final static CandidatesFrame candidatesFrame = new CandidatesFrame();
 
     /**
      * Launch the application.
@@ -21,7 +20,7 @@ public class App {
             public void run() {
                 try {
                     mainMenuFrame.setLocationRelativeTo(null);
-                    mainMenuFrame.setVisible(true);
+                    mainMenuFrame.setVisible(false);
 
                     insertNewUserFrame.setLocationRelativeTo(null);
                     insertNewUserFrame.setVisible(false);
@@ -31,6 +30,9 @@ public class App {
 
                     votingResultsFrame.setLocationRelativeTo(null);
                     votingResultsFrame.setVisible(false);
+
+                    candidatesFrame.setLocationRelativeTo(null);
+                    candidatesFrame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -52,5 +54,9 @@ public class App {
 
     public static VotingResultsFrame getVotingResultsFrame() {
         return votingResultsFrame;
+    }
+
+    public static CandidatesFrame getCandidatesFrame() {
+        return candidatesFrame;
     }
 }
