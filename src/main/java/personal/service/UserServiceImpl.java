@@ -13,6 +13,8 @@ import personal.model.User;
 import personal.service.exceptions.CandidateNotFoundException;
 import personal.service.exceptions.UserNotFoundException;
 
+import java.util.List;
+
 public class UserServiceImpl implements IUserService {
     private final IUserDAO userDAO;
 
@@ -99,5 +101,43 @@ public class UserServiceImpl implements IUserService {
         user.setPassword(BCrypt.hashpw(dto.getPassword(), BCrypt.gensalt(12)));
         user.setHasVoted(0);
         return user;
+    }
+
+    /**
+     * Returns empty list if there are no users
+     * @return
+     * @throws UserDAOException
+     */
+    @Override
+    public List<User> getAllUsers() throws UserDAOException {
+        return userDAO.getAllUsers();
+    }
+
+    /**
+     * Returns empty list if there are no users
+     * @param votedCid
+     * @return
+     * @throws UserDAOException
+     */
+    @Override
+    public List<User> getAllUsersByVotedCid(Integer votedCid)
+            throws UserDAOException, CandidateDAOException, CandidateNotFoundException {
+        ICandidateDAO candidateDAO = new CandidateDAOImpl();
+
+        if (!candidateDAO.cidExists(votedCid)) {
+            throw new CandidateNotFoundException("Candidate with id: " + votedCid + " was not found.");
+        }
+
+        return userDAO.getUsersByVotedCid(votedCid);
+    }
+
+    @Override
+    public void removeAllVotesOfSpecificCid(Integer votedCid)
+            throws UserDAOException, CandidateDAOException, CandidateNotFoundException {
+        ICandidateDAO candidateDAO = new CandidateDAOImpl();
+        if (!candidateDAO.cidExists(votedCid)) {
+            throw new CandidateNotFoundException("Candidate with id: " + votedCid + " was not found.");
+        }
+        userDAO.removeAllVotesOfSpecificCid(votedCid);
     }
 }

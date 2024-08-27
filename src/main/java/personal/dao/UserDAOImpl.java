@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDAOImpl implements IUserDAO {
     @Override
@@ -177,6 +179,80 @@ public class UserDAOImpl implements IUserDAO {
         } catch (SQLException e) {
             e.printStackTrace();
             throw new UserDAOException("SQL error in emailExists for email = " + email);
+        }
+    }
+
+    @Override
+    public List<User> getAllUsers() throws UserDAOException {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM users;";
+        try(Connection connection = DBUtil.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                User user = new User();
+                user.setUid(rs.getInt("uid"));
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setFirstname(rs.getString("firstname"));
+                user.setLastname(rs.getString("lastname"));
+                user.setDob(rs.getDate("dob"));
+                user.setPassword(rs.getString("password"));
+                user.setHasVoted(rs.getInt("hasVoted"));
+                user.setVotedCid(rs.getInt("voted_cid"));
+
+                users.add(user);
+            }
+
+            return users;
+        } catch (SQLException e) {
+            throw new UserDAOException("SQL error in get all users");
+        }
+    }
+
+    @Override
+    public List<User> getUsersByVotedCid(Integer votedCid) throws UserDAOException {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM users WHERE voted_cid = ?;";
+
+        try(Connection connection = DBUtil.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, votedCid);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                User user = new User();
+                user.setUid(rs.getInt("uid"));
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setFirstname(rs.getString("firstname"));
+                user.setLastname(rs.getString("lastname"));
+                user.setDob(rs.getDate("dob"));
+                user.setPassword(rs.getString("password"));
+                user.setHasVoted(rs.getInt("hasVoted"));
+                user.setVotedCid(rs.getInt("voted_cid"));
+
+                users.add(user);
+            }
+
+            return users;
+        } catch (SQLException e) {
+            throw new UserDAOException("SQL error in get users by voted cid");
+        }
+    }
+
+    @Override
+    public void removeAllVotesOfSpecificCid(Integer votedCid) throws UserDAOException {
+        String sql = "UPDATE users SET hasVoted = 0, voted_cid = NULL WHERE voted_cid = ?;";
+
+        try (Connection connection = DBUtil.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, votedCid);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new UserDAOException("SQL error in clean users vote specific cid");
         }
     }
 }

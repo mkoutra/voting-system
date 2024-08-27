@@ -17,7 +17,7 @@ import java.util.Map;
 public class CandidateDAOImpl implements ICandidateDAO {
     @Override
     public Candidate insert(Candidate candidate) throws CandidateDAOException {
-        String sql = "INSERT INTO candidate (firstname, lastname) VALUES (?, ?)";
+        String sql = "INSERT INTO candidates (firstname, lastname) VALUES (?, ?)";
 
         try (Connection connection = DBUtil.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
