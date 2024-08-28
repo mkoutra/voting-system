@@ -222,7 +222,7 @@ public class VotingFrame extends JFrame {
 		selectedCandidatePanel.add(voteBtn);
 
 		optionsPanel = new JPanel();
-		optionsPanel.setBounds(346, 160, 141, 98);
+		optionsPanel.setBounds(346, 124, 141, 134);
 		contentPane.add(optionsPanel);
 		optionsPanel.setLayout(null);
 
@@ -256,7 +256,7 @@ public class VotingFrame extends JFrame {
 				}
 			}
 		});
-		logoutBtn.setBounds(0, 73, 141, 25);
+		logoutBtn.setBounds(0, 109, 141, 25);
 		optionsPanel.add(logoutBtn);
 		logoutBtn.setForeground(new Color(52, 101, 164));
 
@@ -270,6 +270,27 @@ public class VotingFrame extends JFrame {
 		resultsBtn.setBounds(0, 36, 141, 25);
 		optionsPanel.add(resultsBtn);
 		resultsBtn.setForeground(new Color(52, 101, 164));
+
+		JButton changePasswordBtn = new JButton("Change password");
+		changePasswordBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					User user = mapReadOnlyDTOToUser(voterReadOnlyDTO);
+					App.getChangePasswordFrame().setUser(user);
+					App.getChangePasswordFrame().setVisible(true);
+					App.getVotingWindow().setEnabled(false);
+				} catch (UserNotFoundException | UserDAOException e1) {
+					JOptionPane.showMessageDialog(null, "Unable to open change password window",
+							"Error", JOptionPane.ERROR_MESSAGE);
+				}
+
+			}
+		});
+		changePasswordBtn.setFont(new Font("Dialog", Font.BOLD, 10));
+		changePasswordBtn.setForeground(new Color(52, 101, 164));
+		changePasswordBtn.setBounds(0, 72, 141, 25);
+		optionsPanel.add(changePasswordBtn);
 	}
 
 	private void buildCandidatesTable() {

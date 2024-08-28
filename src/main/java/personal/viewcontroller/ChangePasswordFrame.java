@@ -1,5 +1,6 @@
 package personal.viewcontroller;
 
+import personal.App;
 import personal.dao.IUserDAO;
 import personal.dao.UserDAOImpl;
 import personal.dao.exceptions.UserDAOException;
@@ -59,6 +60,7 @@ public class ChangePasswordFrame extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				cleanAll();
+				App.getVotingWindow().setEnabled(true);
 				dispose();
 			}
 		});
@@ -129,6 +131,7 @@ public class ChangePasswordFrame extends JFrame {
 						cleanAll();
 						JOptionPane.showMessageDialog(null, "Password changed successfully",
 								"Password Changed", JOptionPane.INFORMATION_MESSAGE);
+						App.getVotingWindow().setEnabled(true);
 						dispose();
 					}
 				} catch (WrongPasswordException e1) {

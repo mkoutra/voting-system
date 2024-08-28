@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 public class ChangePasswordValidator {
     private List<String> errors = new ArrayList<>();
 
-    public ChangePasswordDTO() {}
+    public ChangePasswordValidator() {}
 
     public List<String> validate(ChangePasswordDTO dto) {
         if (dto == null || dto.getCurrentPassword() == null || dto.getNewPassword() == null

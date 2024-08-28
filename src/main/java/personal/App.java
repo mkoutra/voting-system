@@ -1,6 +1,5 @@
 package personal;
 
-import personal.service.exceptions.CandidateNotFoundException;
 import personal.viewcontroller.*;
 
 import java.awt.EventQueue;
@@ -11,6 +10,7 @@ public class App {
     private final static VotingFrame votingFrame = new VotingFrame();
     private final static VotingResultsFrame votingResultsFrame = new VotingResultsFrame();
     private final static CandidatesFrame candidatesFrame = new CandidatesFrame();
+    private final static ChangePasswordFrame changePasswordFrame = new ChangePasswordFrame();
 
     /**
      * Launch the application.
@@ -33,6 +33,9 @@ public class App {
 
                     candidatesFrame.setLocationRelativeTo(null);
                     candidatesFrame.setVisible(false);
+
+                    changePasswordFrame.setLocationRelativeTo(null);
+                    changePasswordFrame.setVisible(false);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -58,5 +61,9 @@ public class App {
 
     public static CandidatesFrame getCandidatesFrame() {
         return candidatesFrame;
+    }
+
+    public static ChangePasswordFrame getChangePasswordFrame() {
+        return changePasswordFrame;
     }
 }
