@@ -3,12 +3,14 @@ package personal.service;
 import personal.dao.exceptions.UserDAOException;
 import personal.dao.exceptions.CandidateDAOException;
 import personal.dto.CandidateReadOnlyDTO;
+import personal.dto.ChangePasswordDTO;
 import personal.dto.UserReadOnlyDTO;
 import personal.service.exceptions.UserNotFoundException;
 import personal.service.exceptions.CandidateNotFoundException;
 
 import personal.dto.UserInsertDTO;
 import personal.model.User;
+import personal.service.exceptions.WrongPasswordException;
 
 import java.util.List;
 
@@ -24,4 +26,5 @@ public interface IUserService {
     List<User> getAllUsers() throws UserDAOException;
     List<User> getAllUsersByVotedCid(Integer votedCid) throws UserDAOException, CandidateDAOException, CandidateNotFoundException;
     void removeAllVotesOfSpecificCid(Integer votedCid) throws UserDAOException, CandidateDAOException, CandidateNotFoundException;
+    User changePassword(User user, ChangePasswordDTO dto) throws UserNotFoundException, WrongPasswordException, UserDAOException;
 }

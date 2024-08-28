@@ -7,11 +7,13 @@ import personal.dao.IUserDAO;
 import personal.dao.exceptions.CandidateDAOException;
 import personal.dao.exceptions.UserDAOException;
 import personal.dto.CandidateReadOnlyDTO;
+import personal.dto.ChangePasswordDTO;
 import personal.dto.UserInsertDTO;
 import personal.dto.UserReadOnlyDTO;
 import personal.model.User;
 import personal.service.exceptions.CandidateNotFoundException;
 import personal.service.exceptions.UserNotFoundException;
+import personal.service.exceptions.WrongPasswordException;
 
 import java.util.List;
 
@@ -139,5 +141,27 @@ public class UserServiceImpl implements IUserService {
             throw new CandidateNotFoundException("Candidate with id: " + votedCid + " was not found.");
         }
         userDAO.removeAllVotesOfSpecificCid(votedCid);
+    }
+
+    @Override
+    public User changePassword(User user, ChangePasswordDTO dto)
+            throws UserNotFoundException,WrongPasswordException, UserDAOException {
+        if (!userDAO.usernameExists(user.getUsername())) {
+            throw new UserNotFoundException("User: " + user.getUsername() + " was not found.");
+        }
+
+        if (!authenticateUser(user.getUsername(), dto.getCurrentPassword())) {
+            throw new WrongPasswordException("Wrong password given by the user");
+        }
+
+        user.setPassword(BCrypt.hashpw(dto.getNewPassword(), BCrypt.gensalt(12)));
+
+        try {
+            userDAO.update(user);
+            return user;
+        } catch (UserDAOException e) {
+            user.setPassword(BCrypt.hashpw(dto.getCurrentPassword(), BCrypt.gensalt(12)));
+            throw new UserDAOException("SQL error in change Password");
+        }
     }
 }
