@@ -1,7 +1,6 @@
 package personal.dao;
 
 import personal.dao.exceptions.CandidateDAOException;
-import personal.dao.exceptions.UserDAOException;
 import personal.model.Candidate;
 import personal.service.util.DBUtil;
 

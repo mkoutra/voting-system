@@ -20,7 +20,7 @@ public class App {
             public void run() {
                 try {
                     mainMenuFrame.setLocationRelativeTo(null);
-                    mainMenuFrame.setVisible(false);
+                    mainMenuFrame.setVisible(true);
 
                     insertNewUserFrame.setLocationRelativeTo(null);
                     insertNewUserFrame.setVisible(false);
@@ -32,7 +32,7 @@ public class App {
                     votingResultsFrame.setVisible(false);
 
                     candidatesFrame.setLocationRelativeTo(null);
-                    candidatesFrame.setVisible(true);
+                    candidatesFrame.setVisible(false);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

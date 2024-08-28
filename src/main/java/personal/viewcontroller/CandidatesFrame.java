@@ -1,5 +1,6 @@
 package personal.viewcontroller;
 
+import personal.App;
 import personal.dao.CandidateDAOImpl;
 import personal.dao.ICandidateDAO;
 import personal.dao.IUserDAO;
@@ -62,9 +63,13 @@ public class CandidatesFrame extends JFrame {
 			}
 			@Override
 			public void windowClosing(WindowEvent e) {
+				App.getMainMenuFrame().setEnabled(true);
+				App.getMainMenuFrame().setVisible(true);
+				cleanAll();
+				dispose();
 			}
 		});
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 577, 420);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -308,8 +313,7 @@ public class CandidatesFrame extends JFrame {
 					buildCandidatesTable(candidatesWithVotesReadOnlyDTOs);
 
 					// Clean texts
-					insertFirstnameText.setText("");
-					insertLastnameText.setText("");
+					cleanInsertCandidate();
                 } catch (CandidateDAOException e1) {
 					JOptionPane.showMessageDialog(null, "Error in Candidate storage",
 							"SQL-Insertion error", JOptionPane.ERROR_MESSAGE);
@@ -411,5 +415,22 @@ public class CandidatesFrame extends JFrame {
 		candidateId.setText("");
 		candidateFirstnameText.setText("");
 		candidateLastnameText.setText("");
+	}
+
+	private void cleanInsertCandidate() {
+		insertFirstnameText.setText("");
+		insertLastnameText.setText("");
+	}
+
+	private void cleanTable() {
+		for (int i = candidatesModel.getRowCount() - 1; i >= 0; i--) {
+			candidatesModel.removeRow(i);
+		}
+	}
+
+	private void cleanAll() {
+		cleanTable();
+		cleanInsertCandidate();
+		cleanEditCandidate();
 	}
 }

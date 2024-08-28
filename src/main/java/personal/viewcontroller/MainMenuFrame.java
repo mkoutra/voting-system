@@ -4,6 +4,7 @@ import personal.App;
 import personal.dao.IUserDAO;
 import personal.dao.UserDAOImpl;
 import personal.dao.exceptions.UserDAOException;
+import personal.dto.UserInsertDTO;
 import personal.dto.UserLoginDTO;
 import personal.dto.UserReadOnlyDTO;
 import personal.model.User;
@@ -16,10 +17,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
+import java.util.Date;
 import javax.swing.border.BevelBorder;
 
 public class MainMenuFrame extends JFrame {
@@ -37,6 +36,12 @@ public class MainMenuFrame extends JFrame {
 	 * Create the frame.
 	 */
 	public MainMenuFrame() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent e) {
+				createAdminAccount();
+			}
+		});
 		setResizable(false);
 		setTitle("Voting");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -129,9 +134,14 @@ public class MainMenuFrame extends JFrame {
 					return;
 				}
 
-				// Activate Voting Window and close current frame.
+				// Activate Voting or Admin Window and close current frame.
 				cleanTexts();
-				activateVotingWindow(userLoginDTO);
+
+				if (userLoginDTO.getUsername().equals("admin")) {
+					activateCandidateWindow(userLoginDTO);
+				} else {
+					activateVotingWindow(userLoginDTO);
+				}
 			}
 		});
 		submitBtn.setBounds(81, 140, 161, 25);
@@ -195,9 +205,45 @@ public class MainMenuFrame extends JFrame {
 		App.getMainMenuFrame().setVisible(false);
 	}
 
+	private void activateCandidateWindow(UserLoginDTO userLoginDTO) {
+		UserReadOnlyDTO userReadOnlyDTO = null;
+
+		// Map to read only dto
+		userReadOnlyDTO = mapToReadOnlyDTO(userLoginDTO);
+
+		App.getCandidatesFrame().setVisible(true);
+
+		// Disable and hide Main Menu Frame
+		App.getMainMenuFrame().setEnabled(false);
+		App.getMainMenuFrame().setVisible(false);
+	}
+
 	private void cleanTexts() {
 		usernameText.setText("");
 		passwordField.setText("");
 		failedLoginText.setVisible(false);
+	}
+
+	private void createAdminAccount() {
+		try {
+			if (userDAO.usernameExists("admin")) {
+				return;
+			}
+
+			UserInsertDTO insertDTO = new UserInsertDTO();
+			insertDTO.setUsername("admin");
+			insertDTO.setEmail("-");
+			insertDTO.setFirstname("Admin");
+			insertDTO.setLastname("Admin");
+			insertDTO.setDateOfBirth(new Date(System.currentTimeMillis()));
+//			insertDTO.setPassword();
+//			insertDTO.setReEnteredPassword();
+
+			userService.insertUser(insertDTO);
+		} catch (UserDAOException e1) {
+			e1.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Admin insertion error",
+					"Admin Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 }
