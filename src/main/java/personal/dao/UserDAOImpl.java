@@ -4,18 +4,15 @@ import personal.dao.exceptions.UserDAOException;
 import personal.model.User;
 import personal.service.util.DBUtil;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserDAOImpl implements IUserDAO {
     @Override
     public User insert(User user) throws UserDAOException {
-        String sql = "INSERT INTO users (username, password, email, firstname, lastname, dob, hasVoted) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users (username, password, email, firstname, lastname, dob, hasVoted, voted_cid) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = DBUtil.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -26,6 +23,12 @@ public class UserDAOImpl implements IUserDAO {
             ps.setString(5, user.getLastname());
             ps.setDate(6, new java.sql.Date(user.getDob().getTime()));
             ps.setInt(7, user.getHasVoted());
+
+            if (user.getVotedCid() == null) {
+                ps.setNull(8, Types.INTEGER);
+            } else {
+                ps.setInt(8, user.getVotedCid());
+            }
 
             ps.executeUpdate();
 
@@ -52,7 +55,13 @@ public class UserDAOImpl implements IUserDAO {
             ps.setString(5, user.getLastname());
             ps.setDate(6, new java.sql.Date(user.getDob().getTime()));
             ps.setInt(7, user.getHasVoted());
-            ps.setInt(8, user.getVotedCid());
+
+            if (user.getVotedCid() == null) {
+                ps.setNull(8, Types.INTEGER);
+            } else {
+                ps.setInt(8, user.getVotedCid());
+            }
+
             ps.setInt(9, user.getUid());
 
             ps.executeUpdate();
@@ -100,6 +109,9 @@ public class UserDAOImpl implements IUserDAO {
                 user.setPassword(rs.getString("password"));
                 user.setHasVoted(rs.getInt("hasVoted"));
                 user.setVotedCid(rs.getInt("voted_cid"));
+                if (rs.wasNull()) {
+                    user.setVotedCid(null);
+                }
             }
 
             return user;
@@ -131,6 +143,9 @@ public class UserDAOImpl implements IUserDAO {
                 user.setPassword(rs.getString("password"));
                 user.setHasVoted(rs.getInt("hasVoted"));
                 user.setVotedCid(rs.getInt("voted_cid"));
+                if (rs.wasNull()) {
+                    user.setVotedCid(null);
+                }
             }
 
             return user;
@@ -201,6 +216,9 @@ public class UserDAOImpl implements IUserDAO {
                 user.setPassword(rs.getString("password"));
                 user.setHasVoted(rs.getInt("hasVoted"));
                 user.setVotedCid(rs.getInt("voted_cid"));
+                if (rs.wasNull()) {
+                    user.setVotedCid(null);
+                }
 
                 users.add(user);
             }
@@ -233,6 +251,9 @@ public class UserDAOImpl implements IUserDAO {
                 user.setPassword(rs.getString("password"));
                 user.setHasVoted(rs.getInt("hasVoted"));
                 user.setVotedCid(rs.getInt("voted_cid"));
+                if (rs.wasNull()) {
+                    user.setVotedCid(null);
+                }
 
                 users.add(user);
             }
