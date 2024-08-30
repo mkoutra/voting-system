@@ -33,6 +33,15 @@ public class ChangePasswordFrame extends JFrame {
 	private JPasswordField reEnteredPasswordField;
 	private JPasswordField currentPasswordField;
 	private User user = null;
+	private JFrame parentFrame = null;
+
+	public JFrame getParentFrame() {
+		return parentFrame;
+	}
+
+	public void setParentFrame(JFrame parentFrame) {
+		this.parentFrame = parentFrame;
+	}
 
 	public User getUser() {
 		return user;
@@ -60,7 +69,7 @@ public class ChangePasswordFrame extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				cleanAll();
-				App.getVotingWindow().setEnabled(true);
+				parentFrame.setEnabled(true);
 				dispose();
 			}
 		});
@@ -131,7 +140,7 @@ public class ChangePasswordFrame extends JFrame {
 						cleanAll();
 						JOptionPane.showMessageDialog(null, "Password changed successfully",
 								"Password Changed", JOptionPane.INFORMATION_MESSAGE);
-						App.getVotingWindow().setEnabled(true);
+						parentFrame.setEnabled(true);
 						dispose();
 					}
 				} catch (WrongPasswordException e1) {

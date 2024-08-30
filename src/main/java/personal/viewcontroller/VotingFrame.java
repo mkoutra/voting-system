@@ -278,13 +278,13 @@ public class VotingFrame extends JFrame {
 				try {
 					User user = mapReadOnlyDTOToUser(voterReadOnlyDTO);
 					App.getChangePasswordFrame().setUser(user);
+					App.getChangePasswordFrame().setParentFrame(App.getVotingWindow());
 					App.getChangePasswordFrame().setVisible(true);
 					App.getVotingWindow().setEnabled(false);
 				} catch (UserNotFoundException | UserDAOException e1) {
 					JOptionPane.showMessageDialog(null, "Unable to open change password window",
 							"Error", JOptionPane.ERROR_MESSAGE);
 				}
-
 			}
 		});
 		changePasswordBtn.setFont(new Font("Dialog", Font.BOLD, 10));

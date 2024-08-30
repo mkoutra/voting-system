@@ -63,8 +63,7 @@ public class CandidatesFrame extends JFrame {
 			}
 			@Override
 			public void windowClosing(WindowEvent e) {
-				App.getMainMenuFrame().setEnabled(true);
-				App.getMainMenuFrame().setVisible(true);
+				App.getAdminOptionsFrame().setEnabled(true);
 				cleanAll();
 				dispose();
 			}

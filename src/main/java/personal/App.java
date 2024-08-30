@@ -11,6 +11,7 @@ public class App {
     private final static VotingResultsFrame votingResultsFrame = new VotingResultsFrame();
     private final static CandidatesFrame candidatesFrame = new CandidatesFrame();
     private final static ChangePasswordFrame changePasswordFrame = new ChangePasswordFrame();
+    private final static AdminOptionsFrame adminOptionsFrame = new AdminOptionsFrame();
 
     /**
      * Launch the application.
@@ -21,6 +22,9 @@ public class App {
                 try {
                     mainMenuFrame.setLocationRelativeTo(null);
                     mainMenuFrame.setVisible(true);
+
+                    adminOptionsFrame.setLocationRelativeTo(null);
+                    adminOptionsFrame.setVisible(false);
 
                     insertNewUserFrame.setLocationRelativeTo(null);
                     insertNewUserFrame.setVisible(false);
@@ -66,4 +70,6 @@ public class App {
     public static ChangePasswordFrame getChangePasswordFrame() {
         return changePasswordFrame;
     }
+
+    public static AdminOptionsFrame getAdminOptionsFrame() { return adminOptionsFrame; }
 }

@@ -39,7 +39,16 @@ public class MainMenuFrame extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent e) {
-				createAdminAccount();
+				try {
+					if (userDAO.usernameExists("admin")) {
+						return;
+					}
+					createAdminAccount();
+				} catch (UserDAOException e1) {
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(null, "Admin insertion error",
+							"Admin Error", JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		setResizable(false);
@@ -134,14 +143,18 @@ public class MainMenuFrame extends JFrame {
 					return;
 				}
 
-				// Activate Voting or Admin Window and close current frame.
 				cleanTexts();
 
+				// Activate Voting or Admin Window
 				if (userLoginDTO.getUsername().equals("admin")) {
-					activateCandidateWindow(userLoginDTO);
+					activateAdminOptionsWindow();
 				} else {
 					activateVotingWindow(userLoginDTO);
 				}
+
+				// Disable and hide Main Menu Frame
+				App.getMainMenuFrame().setEnabled(false);
+				App.getMainMenuFrame().setVisible(false);
 			}
 		});
 		submitBtn.setBounds(81, 140, 161, 25);
@@ -199,23 +212,10 @@ public class MainMenuFrame extends JFrame {
 		// Send user information to votingWindow and activate it
 		App.getVotingWindow().setVoterReadOnlyDTO(userReadOnlyDTO);
 		App.getVotingWindow().setVisible(true);
-
-		// Disable and hide Main Menu Frame
-		App.getMainMenuFrame().setEnabled(false);
-		App.getMainMenuFrame().setVisible(false);
 	}
 
-	private void activateCandidateWindow(UserLoginDTO userLoginDTO) {
-		UserReadOnlyDTO userReadOnlyDTO = null;
-
-		// Map to read only dto
-		userReadOnlyDTO = mapToReadOnlyDTO(userLoginDTO);
-
-		App.getCandidatesFrame().setVisible(true);
-
-		// Disable and hide Main Menu Frame
-		App.getMainMenuFrame().setEnabled(false);
-		App.getMainMenuFrame().setVisible(false);
+	private void activateAdminOptionsWindow() {
+		App.getAdminOptionsFrame().setVisible(true);
 	}
 
 	private void cleanTexts() {
@@ -224,26 +224,16 @@ public class MainMenuFrame extends JFrame {
 		failedLoginText.setVisible(false);
 	}
 
-	private void createAdminAccount() {
-		try {
-			if (userDAO.usernameExists("admin")) {
-				return;
-			}
+	private void createAdminAccount() throws UserDAOException {
+		UserInsertDTO insertDTO = new UserInsertDTO();
+		insertDTO.setUsername("admin");
+		insertDTO.setEmail("-");
+		insertDTO.setFirstname("Admin");
+		insertDTO.setLastname("Admin");
+		insertDTO.setDateOfBirth(new Date(System.currentTimeMillis()));
+		insertDTO.setPassword("Aa1234567*");
+		insertDTO.setReEnteredPassword("Aa1234567*");
 
-			UserInsertDTO insertDTO = new UserInsertDTO();
-			insertDTO.setUsername("admin");
-			insertDTO.setEmail("-");
-			insertDTO.setFirstname("Admin");
-			insertDTO.setLastname("Admin");
-			insertDTO.setDateOfBirth(new Date(System.currentTimeMillis()));
-//			insertDTO.setPassword();
-//			insertDTO.setReEnteredPassword();
-
-			userService.insertUser(insertDTO);
-		} catch (UserDAOException e1) {
-			e1.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Admin insertion error",
-					"Admin Error", JOptionPane.ERROR_MESSAGE);
-		}
+		userService.insertUser(insertDTO);
 	}
 }
