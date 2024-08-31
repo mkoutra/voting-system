@@ -1,11 +1,9 @@
 package personal.viewcontroller;
 
-import personal.App;
 import personal.dao.IUserDAO;
 import personal.dao.UserDAOImpl;
 import personal.dao.exceptions.UserDAOException;
 import personal.dto.ChangePasswordDTO;
-import personal.dto.UserReadOnlyDTO;
 import personal.model.User;
 import personal.service.IUserService;
 import personal.service.UserServiceImpl;
