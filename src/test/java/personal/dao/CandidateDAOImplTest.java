@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import personal.dao.exceptions.CandidateDAOException;
 import personal.model.Candidate;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

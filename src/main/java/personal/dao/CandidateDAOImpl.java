@@ -136,8 +136,8 @@ public class CandidateDAOImpl implements ICandidateDAO {
     @Override
     public Map<Candidate, Integer> getAllCandidatesWithVotes() throws CandidateDAOException {
         Map<Candidate, Integer> candidatesWithVotes = new HashMap<>();
-        String sql = "SELECT c.cid, c.firstname, c.lastname, COUNT(voted_cid) AS 'total_votes'" +
-                " FROM candidates c LEFT JOIN users u ON u.voted_cid = c.cid" +
+        String sql = "SELECT c.cid, c.firstname, c.lastname, COUNT(votedCid) AS 'total_votes'" +
+                " FROM candidates c LEFT JOIN users u ON u.votedCid = c.cid" +
                 " GROUP BY c.cid, c.firstname, c.lastname";
         try(Connection connection = DBUtil.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql)) {

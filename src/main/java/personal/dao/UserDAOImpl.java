@@ -11,7 +11,7 @@ import java.util.List;
 public class UserDAOImpl implements IUserDAO {
     @Override
     public User insert(User user) throws UserDAOException {
-        String sql = "INSERT INTO users (username, password, email, firstname, lastname, dob, hasVoted, voted_cid) " +
+        String sql = "INSERT INTO users (username, password, email, firstname, lastname, dob, hasVoted, votedCid) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = DBUtil.getConnection();
@@ -42,7 +42,7 @@ public class UserDAOImpl implements IUserDAO {
     @Override
     public User update(User user) throws UserDAOException {
         String sql = "UPDATE users SET username = ?, password = ?, email = ?, " +
-                     "firstname = ?, lastname = ?, dob = ?, hasVoted = ?, voted_cid = ? " +
+                     "firstname = ?, lastname = ?, dob = ?, hasVoted = ?, votedCid = ? " +
                      "WHERE uid = ?;";
 
         try (Connection connection = DBUtil.getConnection();
@@ -108,7 +108,7 @@ public class UserDAOImpl implements IUserDAO {
                 user.setDob(rs.getDate("dob"));
                 user.setPassword(rs.getString("password"));
                 user.setHasVoted(rs.getInt("hasVoted"));
-                user.setVotedCid(rs.getInt("voted_cid"));
+                user.setVotedCid(rs.getInt("votedCid"));
                 if (rs.wasNull()) {
                     user.setVotedCid(null);
                 }
@@ -142,7 +142,7 @@ public class UserDAOImpl implements IUserDAO {
                 user.setDob(rs.getDate("dob"));
                 user.setPassword(rs.getString("password"));
                 user.setHasVoted(rs.getInt("hasVoted"));
-                user.setVotedCid(rs.getInt("voted_cid"));
+                user.setVotedCid(rs.getInt("votedCid"));
                 if (rs.wasNull()) {
                     user.setVotedCid(null);
                 }
@@ -215,7 +215,7 @@ public class UserDAOImpl implements IUserDAO {
                 user.setDob(rs.getDate("dob"));
                 user.setPassword(rs.getString("password"));
                 user.setHasVoted(rs.getInt("hasVoted"));
-                user.setVotedCid(rs.getInt("voted_cid"));
+                user.setVotedCid(rs.getInt("votedCid"));
                 if (rs.wasNull()) {
                     user.setVotedCid(null);
                 }
@@ -232,7 +232,7 @@ public class UserDAOImpl implements IUserDAO {
     @Override
     public List<User> getUsersByVotedCid(Integer votedCid) throws UserDAOException {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT * FROM users WHERE voted_cid = ?;";
+        String sql = "SELECT * FROM users WHERE votedCid = ?;";
 
         try(Connection connection = DBUtil.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -250,7 +250,7 @@ public class UserDAOImpl implements IUserDAO {
                 user.setDob(rs.getDate("dob"));
                 user.setPassword(rs.getString("password"));
                 user.setHasVoted(rs.getInt("hasVoted"));
-                user.setVotedCid(rs.getInt("voted_cid"));
+                user.setVotedCid(rs.getInt("votedCid"));
                 if (rs.wasNull()) {
                     user.setVotedCid(null);
                 }
@@ -266,7 +266,7 @@ public class UserDAOImpl implements IUserDAO {
 
     @Override
     public void removeAllVotesOfSpecificCid(Integer votedCid) throws UserDAOException {
-        String sql = "UPDATE users SET hasVoted = 0, voted_cid = NULL WHERE voted_cid = ?;";
+        String sql = "UPDATE users SET hasVoted = 0, votedCid = NULL WHERE votedCid = ?;";
 
         try (Connection connection = DBUtil.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
