@@ -96,7 +96,9 @@ public class VotingFrame extends JFrame {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				logoutBtn.doClick();
+				if (isEnabled()) {
+					logoutBtn.doClick();
+				}
 			}
 		});
 		setResizable(false);
@@ -358,11 +360,14 @@ public class VotingFrame extends JFrame {
 					" vote? This action cannot be undone.", "Vote verification", JOptionPane.YES_NO_OPTION);
 			if (response == JOptionPane.YES_OPTION) {
 				userService.voteACandidate(userReadOnlyDTO, candidateReadOnlyDTO);
+
 				JOptionPane.showMessageDialog(null, "Thank you for voting!" +
 						" Your vote has been successfully submitted.", "Successful Voting", JOptionPane.INFORMATION_MESSAGE);
+
 				selectACandidateText.setText("Your vote has been successfully submitted.");
 				voteBtn.setEnabled(false);
 				candidatesTable.setEnabled(false);
+				cleanSelectedUser();
 			}
 		} catch (CandidateNotFoundException e1) {
 			JOptionPane.showMessageDialog(null, "Candidate does not exist",

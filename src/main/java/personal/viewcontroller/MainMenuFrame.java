@@ -50,10 +50,17 @@ public class MainMenuFrame extends JFrame {
 							"Admin Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				if (isEnabled()) {
+					System.exit(0);
+				}
+			}
 		});
 		setResizable(false);
 		setTitle("Voting");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 448, 346);
 		contentPane = new JPanel();
 		contentPane.setForeground(new Color(52, 101, 164));

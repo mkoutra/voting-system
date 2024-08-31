@@ -1,5 +1,7 @@
 package personal.viewcontroller;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import personal.App;
 import personal.dao.IUserDAO;
 import personal.dao.UserDAOImpl;
@@ -14,22 +16,34 @@ import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class AdminOptionsFrame extends JFrame {
 	private final static IUserDAO userDAO = new UserDAOImpl();
 	private final static IUserService userService = new UserServiceImpl(userDAO);
 
 	private static final long serialVersionUID = 1L;
+	private static final Log log = LogFactory.getLog(AdminOptionsFrame.class);
 
 	private JPanel contentPane;
+	private JButton logoutBtn;
 
 	/**
 	 * Create the frame.
 	 */
 	public AdminOptionsFrame() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				if (isEnabled()) {
+					logoutBtn.doClick();
+				}
+			}
+		});
 		setResizable(false);
 		setTitle("Administator Options");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 295, 228);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -88,7 +102,7 @@ public class AdminOptionsFrame extends JFrame {
 		changePasswordBtn.setBounds(34, 51, 162, 25);
 		panel.add(changePasswordBtn);
 
-		JButton logoutBtn = new JButton("Logout");
+		logoutBtn = new JButton("Logout");
 		logoutBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

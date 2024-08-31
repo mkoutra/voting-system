@@ -58,8 +58,10 @@ public class InsertNewUserFrame extends JFrame {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				App.getMainMenuFrame().setEnabled(true);
-				dispose();
+				if (isEnabled()) {
+					App.getMainMenuFrame().setEnabled(true);
+					dispose();
+				}
 			}
 		});
 		setResizable(false);

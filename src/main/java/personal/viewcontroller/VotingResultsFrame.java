@@ -57,8 +57,10 @@ public class VotingResultsFrame extends JFrame {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				App.getVotingWindow().setEnabled(true);
-				dispose();
+				if (isEnabled()) {
+					App.getVotingWindow().setEnabled(true);
+					dispose();
+				}
 			}
 		});
 		setResizable(false);

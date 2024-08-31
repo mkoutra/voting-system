@@ -63,9 +63,11 @@ public class CandidatesFrame extends JFrame {
 			}
 			@Override
 			public void windowClosing(WindowEvent e) {
-				App.getAdminOptionsFrame().setEnabled(true);
-				cleanAll();
-				dispose();
+				if (isEnabled()) {
+					App.getAdminOptionsFrame().setEnabled(true);
+					cleanAll();
+					dispose();
+				}
 			}
 		});
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -191,6 +193,9 @@ public class CandidatesFrame extends JFrame {
 					buildCandidatesTable(candidatesWithVotesReadOnlyDTOs);
 
 					cleanEditCandidate();
+
+					JOptionPane.showMessageDialog(null, "Successful candidate update",
+							"Information", JOptionPane.INFORMATION_MESSAGE);
 				} catch (CandidateDAOException e1) {
 					JOptionPane.showMessageDialog(null, "Error in Candidate storage",
 							"SQL-Insertion error", JOptionPane.ERROR_MESSAGE);
@@ -313,6 +318,9 @@ public class CandidatesFrame extends JFrame {
 
 					// Clean texts
 					cleanInsertCandidate();
+
+					JOptionPane.showMessageDialog(null, "Successful candidate insertion",
+							"Information", JOptionPane.INFORMATION_MESSAGE);
                 } catch (CandidateDAOException e1) {
 					JOptionPane.showMessageDialog(null, "Error in Candidate storage",
 							"SQL-Insertion error", JOptionPane.ERROR_MESSAGE);

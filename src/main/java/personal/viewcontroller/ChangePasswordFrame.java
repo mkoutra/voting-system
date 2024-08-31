@@ -68,9 +68,11 @@ public class ChangePasswordFrame extends JFrame {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				cleanAll();
-				parentFrame.setEnabled(true);
-				dispose();
+				if (isEnabled()) {
+					cleanAll();
+					parentFrame.setEnabled(true);
+					dispose();
+				}
 			}
 		});
 		setResizable(false);
