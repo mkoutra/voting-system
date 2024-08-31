@@ -159,7 +159,7 @@ public class ChangePasswordFrame extends JFrame {
 		JPanel titlePanel = new JPanel();
 		titlePanel.setLayout(null);
 		titlePanel.setBackground(new Color(52, 101, 164));
-		titlePanel.setBounds(0, 10, 453, 40);
+		titlePanel.setBounds(0, 0, 453, 40);
 		contentPane.add(titlePanel);
 		
 		JLabel changePasswordLabel = new JLabel("Change Password");
