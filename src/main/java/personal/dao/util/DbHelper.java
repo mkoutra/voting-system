@@ -32,9 +32,11 @@ public class DbHelper {
     private final static ICandidateDAO candidateDAO = new CandidateDAOImpl();
     private final static ICandidateService candidateService = new CandidateServiceImpl(candidateDAO);
 
-
     private DbHelper() {}
 
+    /**
+     * Erase all data from every table inside the 'votingDB' database.
+     */
     public static void eraseAllDate() throws SQLException {
         String sqlFKOff = "SET @@foreign_key_checks = 0";   // To disable foreign key checks
         String sqlFKOn = "SET @@foreign_key_checks = 1";    // To enable foreign key checks
@@ -66,12 +68,6 @@ public class DbHelper {
             e.printStackTrace();
             throw e;
         }
-    }
-
-    private static List<String> wordRepeater(String word, int length) {
-        List<String> wordArray = new ArrayList<>();
-        for (int i = 1; i <= length; i++) wordArray.add(word + String.valueOf(i));
-        return wordArray;
     }
 
     public static void createDummyCandidates(int totalNumberOfCandidates) throws CandidateDAOException {
@@ -109,6 +105,31 @@ public class DbHelper {
         }
     }
 
+
+    public static void eraseDbTable(String tableName) throws SQLException {
+        String sqlFKOff = "SET @@foreign_key_checks = 0;";   // To disable foreign key checks
+        String sqlFKOn = "SET @@foreign_key_checks = 1;";    // To enable foreign key checks
+
+        try (Connection connection = DBUtil.getConnection();
+             PreparedStatement ps1 = connection.prepareStatement(sqlFKOff)){
+
+            // Disable foreign key checks
+            ps1.executeUpdate();
+
+            // Delete all records
+            connection.prepareStatement("DELETE FROM " + tableName + ';').executeUpdate();
+
+            // Reset auto-increment to 1
+            connection.prepareStatement("ALTER TABLE " + tableName + " AUTO_INCREMENT=1;").executeUpdate();
+
+            // Re-activate foreign key checks
+            connection.prepareStatement(sqlFKOn).executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
     private static List<String> mapRsToList(ResultSet rs) throws SQLException {
         List<String> tables = new ArrayList<>();    // Contains the names of the MySQL Database tables
 
@@ -117,5 +138,11 @@ public class DbHelper {
         }
 
         return tables;
+    }
+
+    private static List<String> wordRepeater(String word, int length) {
+        List<String> wordArray = new ArrayList<>(length);
+        for (int i = 1; i <= length; i++) wordArray.add(word + String.valueOf(i));
+        return wordArray;
     }
 }
