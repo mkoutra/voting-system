@@ -37,7 +37,7 @@ public class DbHelper {
     /**
      * Erase all data from every table inside the 'votingDB' database.
      */
-    public static void eraseAllDate() throws SQLException {
+    public static void eraseAllData() throws SQLException {
         String sqlFKOff = "SET @@foreign_key_checks = 0";   // To disable foreign key checks
         String sqlFKOn = "SET @@foreign_key_checks = 1";    // To enable foreign key checks
 
@@ -104,7 +104,6 @@ public class DbHelper {
             userService.insertUser(userInsertDTO);
         }
     }
-
 
     public static void eraseDbTable(String tableName) throws SQLException {
         String sqlFKOff = "SET @@foreign_key_checks = 0;";   // To disable foreign key checks

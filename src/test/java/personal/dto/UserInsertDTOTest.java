@@ -8,10 +8,9 @@ class UserInsertDTOTest {
 
     @Test
     void testConstructor() {
-        UserInsertDTO insertDTO = new UserInsertDTO("gkoutra", "123@123.sa", "G", "K", null,
-            "pass", "passo");
+        UserInsertDTO insertDTO = new UserInsertDTO("username", "123@123.sa", "fff",
+                "lll", null, "pass", "passo");
 
         assertNull(insertDTO.getDateOfBirth());
-        System.out.println(insertDTO);
     }
 }
