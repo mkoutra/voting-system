@@ -1,5 +1,9 @@
 package personal.dto;
 
+/**
+ * Data Transfer Object (DTO) used for transferring user login credentials
+ * from the view layer to the service layer for authentication.
+ */
 public class UserLoginDTO {
     private String username;
     private String password;

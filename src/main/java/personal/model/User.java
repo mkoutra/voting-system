@@ -10,8 +10,8 @@ public class User {
     private String firstname;
     private String lastname;
     private Date dob;
-    private Integer hasVoted;
-    private Integer votedCid;
+    private Integer hasVoted;   // 1 if the user has voted, 0 otherwise
+    private Integer votedCid;   // It is null if the user hasn't voted.
 
     public User() {}
 

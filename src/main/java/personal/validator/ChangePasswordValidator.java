@@ -1,12 +1,9 @@
 package personal.validator;
 
-import personal.dao.exceptions.UserDAOException;
 import personal.dto.ChangePasswordDTO;
-import personal.service.exceptions.UserNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

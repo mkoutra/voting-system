@@ -1,5 +1,9 @@
 package personal.dto;
 
+/**
+ * Data Transfer Object (DTO) used for transferring candidate data along with their vote counts
+ * from the service layer to the view layer in a read-only manner.
+ */
 public class CandidatesWithVotesReadOnlyDTO {
     private Integer cid;
     private String firstname;
