@@ -33,11 +33,20 @@ results and export them in either .csv or .txt formats, ensuring easy data manag
 - Set up the **MySQL** database following the instructions provided below.
 
 ### Building the Project
-- Use **Maven** to build the project and manage dependencies. Navigate to the project directory and run:
+- If you **do not have Maven installed**, you can use the Maven Wrapper included in the project:  - On Linux/macOS:
   ```bash
+  ./mvnw clean package
+  ```
+  - On Windows:
+  ```bash
+  mvwn.cmd clean package 
+  ```
+- If you **already have Maven installed**, navigate to the project directory and run:
+```bash
   mvn clean package
   ```
 - Or, use your preferable IDE (e.g IntelliJ, Eclipse, etc.)
+
 ### Running the Application
 
 After building the project, an executable JAR file named voting-system.jar will be generated in the `target/` directory.
@@ -72,7 +81,7 @@ Docker and run the `create_database.sql` script.
       ```
    2. Create and run a container from the image to set up the database:
       ```bash
-      docker run --name mysql_voting_container -d -p 127.0.0.1:3306:3306 mysql_voting_system_image
+      docker run --name mysql_voting_container -d -p 3306:3306 mysql_voting_system_image
       ```
 
 ### Tables

@@ -30,9 +30,9 @@ class NewUserValidatorTest {
 
         errors = validator.validate(dto);
 
-        for (String key : errors.keySet()) {
-            System.out.println(key +": "+ errors.get(key));
-        }
+//        for (String key : errors.keySet()) {
+//            System.out.println(key +": "+ errors.get(key));
+//        }
         assertEquals("Invalid date.", errors.get("dob"));
         assertEquals("Passwords do not much.", errors.get("reEnteredPassword"));
     }

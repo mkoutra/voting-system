@@ -54,7 +54,7 @@ class CandidateDAOImplTest {
     void getAllCandidatesWithVotes() throws CandidateDAOException {
         Map<Candidate, Integer> candidatesWithVotes = candidateDAO.getAllCandidatesWithVotes();
 
-        System.out.println(candidatesWithVotes);
+//        System.out.println(candidatesWithVotes);
 
         for (Candidate candidate : candidatesWithVotes.keySet()) {
             assertEquals(0, candidatesWithVotes.get(candidate));
