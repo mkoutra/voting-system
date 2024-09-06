@@ -1,5 +1,11 @@
 package personal.model;
 
+/**
+ * A class representing the Candidate.
+ * The same fields are used in the database.
+ *
+ * @author Michail E. Koutrakis
+ */
 public class Candidate {
     private Integer cid;
     private String firstname;

@@ -3,6 +3,8 @@ package personal.dto;
 /**
  * Data Transfer Object (DTO) used for transferring candidate data
  * from the view layer to the service layer during a candidate insertion operation.
+ *
+ * @author Michail E. Koutrakis
  */
 public class CandidateInsertDTO {
     private String firstname;

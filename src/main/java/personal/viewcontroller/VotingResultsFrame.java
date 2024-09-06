@@ -23,6 +23,9 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.*;
 
+/**
+ * @author Michail E. Koutrakis
+ */
 public class VotingResultsFrame extends JFrame {
 	private final ICandidateDAO candidateDAO = new CandidateDAOImpl();
 	private final ICandidateService candidateService = new CandidateServiceImpl(candidateDAO);

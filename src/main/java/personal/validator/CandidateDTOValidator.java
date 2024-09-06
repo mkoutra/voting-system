@@ -6,6 +6,9 @@ import personal.dto.CandidateUpdateDTO;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Michail E. Koutrakis
+ */
 public class CandidateDTOValidator {
 
     public CandidateDTOValidator() {}

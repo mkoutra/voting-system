@@ -8,6 +8,9 @@ import personal.service.IUserService;
 import personal.service.UserServiceImpl;
 import personal.service.exceptions.UserNotFoundException;
 
+/**
+ * @author Michail E. Koutrakis
+ */
 public class LoginValidator {
     private final IUserDAO userDAO = new UserDAOImpl();
     private final IUserService userService = new UserServiceImpl(userDAO);

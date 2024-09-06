@@ -2,6 +2,12 @@ package personal.model;
 
 import java.util.Date;
 
+/**
+ * A class representing the User.
+ * The same fields are used in the database.
+ *
+ * @author Michail E. Koutrakis
+ */
 public class User {
     private Integer uid;
     private String username;

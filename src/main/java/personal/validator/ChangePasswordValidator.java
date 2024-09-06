@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @author Michail E. Koutrakis
+ */
 public class ChangePasswordValidator {
     private List<String> errors = new ArrayList<>();
 

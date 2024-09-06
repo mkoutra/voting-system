@@ -189,3 +189,8 @@ The database uses UTF-8 character encoding.
 ![Change_Password_screen.png](app_screenshots/Change_Password_screen.png)
 
 *The window where users can change their passwords.*
+
+## Contact
+**Michail E. Koutrakis**
+
+**email:** koutrakismichalis [at] gmail [dot] com

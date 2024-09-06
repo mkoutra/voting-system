@@ -3,6 +3,8 @@ package personal.dto;
 /**
  * Data Transfer Object (DTO) used for transferring data related to a password change request
  * from the view layer to the service layer.
+ *
+ * @author Michail E. Koutrakis
  */
 public class ChangePasswordDTO {
     private String currentPassword;

@@ -13,6 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Michail E. Koutrakis
+ */
 public class CandidateDAOImpl implements ICandidateDAO {
     @Override
     public Candidate insert(Candidate candidate) throws CandidateDAOException {

@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.Vector;
 import javax.swing.border.BevelBorder;
 
+/**
+ * @author Michail E. Koutrakis
+ */
 public class VotingFrame extends JFrame {
 	private final ICandidateDAO candidateDAO = new CandidateDAOImpl();
 	private final ICandidateService candidateService = new CandidateServiceImpl(candidateDAO);

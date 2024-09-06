@@ -19,6 +19,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+/**
+ * @author Michail E. Koutrakis
+ */
 public class AdminOptionsFrame extends JFrame {
 	private final static IUserDAO userDAO = new UserDAOImpl();
 	private final static IUserService userService = new UserServiceImpl(userDAO);

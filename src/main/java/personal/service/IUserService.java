@@ -16,6 +16,8 @@ import java.util.List;
 
 /**
  * Service layer interface for managing user-related operations.
+ *
+ * @author Michail E. Koutrakis
  */
 public interface IUserService {
     /**

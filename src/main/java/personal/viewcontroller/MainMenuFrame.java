@@ -19,6 +19,9 @@ import java.awt.Font;
 import java.awt.event.*;
 import javax.swing.border.BevelBorder;
 
+/**
+ * @author Michail E. Koutrakis
+ */
 public class MainMenuFrame extends JFrame {
 	private final IUserDAO userDAO = new UserDAOImpl();
 	private final IUserService userService = new UserServiceImpl(userDAO);

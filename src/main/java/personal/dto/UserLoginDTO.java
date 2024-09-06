@@ -3,6 +3,8 @@ package personal.dto;
 /**
  * Data Transfer Object (DTO) used for transferring user login credentials
  * from the view layer to the service layer for authentication.
+ *
+ * @author Michail E. Koutrakis
  */
 public class UserLoginDTO {
     private String username;

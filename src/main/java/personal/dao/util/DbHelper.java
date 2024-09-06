@@ -24,6 +24,8 @@ import java.util.List;
 
 /**
  * Class to help with testing of DAO
+ *
+ * @author Michail E. Koutrakis
  */
 public class DbHelper {
     private final static IUserDAO userDAO = new UserDAOImpl();

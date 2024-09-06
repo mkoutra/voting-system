@@ -8,6 +8,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Michail E. Koutrakis
+ */
 public class UserDAOImpl implements IUserDAO {
     @Override
     public User insert(User user) throws UserDAOException {

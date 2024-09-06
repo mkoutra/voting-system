@@ -3,6 +3,8 @@ package personal.dto;
 /**
  * Data Transfer Object (DTO) used for transferring candidate data
  * from the service layer to the view layer in a read-only manner.
+ *
+ * @author Michail E. Koutrakis
  */
 public class CandidateReadOnlyDTO {
     private Integer cid;

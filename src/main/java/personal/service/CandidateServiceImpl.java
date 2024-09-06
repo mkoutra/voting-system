@@ -17,6 +17,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Michail E. Koutrakis
+ */
 public class CandidateServiceImpl implements ICandidateService {
     private final ICandidateDAO candidateDAO;
 

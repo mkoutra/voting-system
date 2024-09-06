@@ -4,6 +4,9 @@ import personal.viewcontroller.*;
 
 import java.awt.EventQueue;
 
+/**
+ * @author Michail E. Koutrakis
+ */
 public class App {
     private final static MainMenuFrame mainMenuFrame = new MainMenuFrame();
     private final static InsertNewUserFrame insertNewUserFrame = new InsertNewUserFrame();

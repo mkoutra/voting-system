@@ -20,6 +20,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+/**
+ * @author Michail E. Koutrakis
+ */
 public class UserServiceImpl implements IUserService {
     private final IUserDAO userDAO;
 

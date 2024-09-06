@@ -18,6 +18,9 @@ import java.awt.Font;
 import java.awt.event.*;
 import java.util.Map;
 
+/**
+ * @author Michail E. Koutrakis
+ */
 public class InsertNewUserFrame extends JFrame {
 
 	private final IUserDAO userDAO = new UserDAOImpl();

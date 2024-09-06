@@ -26,6 +26,9 @@ import java.awt.Font;
 import java.util.*;
 import javax.swing.table.DefaultTableModel;
 
+/**
+ * @author Michail E. Koutrakis
+ */
 public class CandidatesFrame extends JFrame {
 	private final ICandidateDAO candidateDAO = new CandidateDAOImpl();
 	private final ICandidateService candidateService = new CandidateServiceImpl(candidateDAO);

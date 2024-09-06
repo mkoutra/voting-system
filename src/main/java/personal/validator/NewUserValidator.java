@@ -14,6 +14,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @author Michail E. Koutrakis
+ */
 public class NewUserValidator {
     private final IUserDAO userDAO = new UserDAOImpl();
     private final IUserService userService = new UserServiceImpl(userDAO);

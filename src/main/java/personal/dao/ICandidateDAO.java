@@ -8,6 +8,8 @@ import java.util.Map;
 
 /**
  * An interface for managing candidate data in the DAO (Data Access Object) layer.
+ *
+ * @author Michail E. Koutrakis
  */
 public interface ICandidateDAO {
 

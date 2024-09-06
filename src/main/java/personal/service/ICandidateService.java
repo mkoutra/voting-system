@@ -15,6 +15,8 @@ import java.util.Map;
 
 /**
  * Service layer interface for managing candidate-related operations.
+ *
+ * @author Michail E. Koutrakis
  */
 public interface ICandidateService {
 

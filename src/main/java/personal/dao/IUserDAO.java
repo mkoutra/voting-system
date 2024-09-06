@@ -7,6 +7,8 @@ import java.util.List;
 
 /**
  * An interface for managing user data in the DAO (Data Access Object) layer.
+ *
+ * @author Michail E. Koutrakis
  */
 public interface IUserDAO {
     /**

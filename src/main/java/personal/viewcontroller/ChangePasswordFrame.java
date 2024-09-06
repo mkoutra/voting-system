@@ -20,6 +20,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
 
+/**
+ * @author Michail E. Koutrakis
+ */
 public class ChangePasswordFrame extends JFrame {
 	private final IUserDAO userDAO = new UserDAOImpl();
 	private final IUserService userService = new UserServiceImpl(userDAO);
