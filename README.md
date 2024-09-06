@@ -11,9 +11,8 @@ results and export them in either .csv or .txt formats, ensuring easy data manag
 - **View and Save Voting Results**: Users can view results and save them as .csv (default) or .txt files.
 
 ## Admin user
-- A special user with the username `admin` and password `Aa1234567*` is pre-existing.
+- A special user with the username admin is automatically created at startup if it does not already exist.
 - The `admin` user is the only one who can add new candidates to the system.
-- The `admin` user can also change their password to one of their own choice.
 
 ## Tools and Technologies
 
@@ -31,9 +30,27 @@ results and export them in either .csv or .txt formats, ensuring easy data manag
 ### Prerequisites
 - Ensure that **Java 11** is installed on your system.
 - Set up the **MySQL** database following the instructions provided below.
+### Configuring the Application
+
+The application uses a `config.properties` file in the root directory to initialize the `admin` user and configure database access.
+
+- **Admin User:** Modify the default admin password (`admin`) in the `config.properties` file.
+  Alternatively, you can update it after logging in as an admin without changing the config file.
+
+- **Database User:** The `config.properties` file also includes the credentials for the MySQL user created by the `mysql_database/create_database.sql` script.
+
+  **IMPORTANT:** Before running the script or building the Docker image, it's strongly advised to replace the default `votingUser` password (`voting`) with a stronger one:
+
+  ```sql
+  CREATE USER 'votingUser' IDENTIFIED BY 'new_secure_password';
+  GRANT ALL ON `votingDB`.* TO 'votingUser';
+
+**and update the `config.properties` file accordingly.**
 
 ### Building the Project
-- If you **do not have Maven installed**, you can use the Maven Wrapper included in the project:  - On Linux/macOS:
+If you have installed Java 11 and above in your system and you have an MySQL server running you can build the project:
+- If you **do not have Maven installed**, you can use the Maven Wrapper included in the project:
+  - On Linux/macOS:
   ```bash
   ./mvnw clean package
   ```
@@ -42,14 +59,13 @@ results and export them in either .csv or .txt formats, ensuring easy data manag
   mvwn.cmd clean package 
   ```
 - If you **already have Maven installed**, navigate to the project directory and run:
-```bash
+  ```bash
   mvn clean package
   ```
-- Or, use your preferable IDE (e.g IntelliJ, Eclipse, etc.)
 
 ### Running the Application
 
-After building the project, an executable JAR file named voting-system.jar will be generated in the `target/` directory.
+After building the project, an executable JAR file named `voting-system.jar` will be generated in the `target/` directory.
 To run the application, execute the following command:
 
 ```bash
@@ -75,7 +91,10 @@ Docker and run the `create_database.sql` script.
    directly to create the database.
 
 2. **Using Docker:**
-   1. Build the Docker image using the following command inside the `mysql_database` directory:
+   1. Build the Docker image using the following command inside the `mysql_database` directory
+
+      **IMPORTANT:** The default `MYSQL_ROOT_PASSWORD` in the `Dockerfile` is set to `password`.
+      It is strongly recommended to replace this with a strong password before building the image.
       ```bash
       docker build -t mysql_voting_system_image .
       ```
@@ -83,6 +102,8 @@ Docker and run the `create_database.sql` script.
       ```bash
       docker run --name mysql_voting_container -d -p 3306:3306 mysql_voting_system_image
       ```
+
+**Ensure the MySQL server is running before executing the application JAR file.**
 
 ### Tables
 
@@ -123,7 +144,10 @@ The database uses UTF-8 character encoding.
 
 ### User and Permissions
 - If the database was created using **Docker** the root password was set to `password`.
-- Creates a MySQL user `votingUser` with full privileges on `votingDB` and password `voting`.
+  You are **strongly advised** to replace this password in the `Dockerfile`.
+- Creates a MySQL user `votingUser` with full privileges on `votingDB` and password `voting`. 
+  As mentioned above, you are **strongly advised** to replace the password and update the `config.properties` accordingly.
+
 ## Application Preview
 
 ### Login Window

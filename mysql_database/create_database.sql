@@ -46,7 +46,6 @@ CREATE TABLE IF NOT EXISTS `votingDB`.`users` (
 ENGINE = InnoDB;
 
 CREATE USER 'votingUser' IDENTIFIED BY 'voting';
-
 GRANT ALL ON `votingDB`.* TO 'votingUser';
 
 SET SQL_MODE=@OLD_SQL_MODE;

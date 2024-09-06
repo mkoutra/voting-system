@@ -130,4 +130,10 @@ public interface IUserService {
      * @throws UserDAOException        If an error occurs during the database operation.
      */
     User changePassword(User user, ChangePasswordDTO dto) throws UserNotFoundException, WrongPasswordException, UserDAOException;
+
+    /**
+     * Creates an admin user.
+     * @throws UserDAOException
+     */
+    void createAdminAccount() throws UserDAOException;
 }

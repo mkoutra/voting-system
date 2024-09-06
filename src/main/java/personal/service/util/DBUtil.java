@@ -4,6 +4,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * Utility class for managing database connections using Apache Commons DBCP.
@@ -11,9 +12,15 @@ import java.sql.SQLException;
 public class DBUtil {
     private final static BasicDataSource ds = new BasicDataSource();
     static {
-        ds.setUrl("jdbc:mysql://localhost:3306/votingDB?serverTimeZone=UTC");
-        ds.setUsername("votingUser");
-        ds.setPassword("voting");
+        // Import data from configuration file config.properties
+        Properties props = ConfigFileUtil.getPropertiesInstance();
+        String dbName = props.getProperty("db.name");
+        String username = props.getProperty("db.user");
+        String password = props.getProperty("db.password");
+
+        ds.setUrl("jdbc:mysql://localhost:3306/" + dbName + "?serverTimeZone=UTC");
+        ds.setUsername(username);
+        ds.setPassword(password);
         ds.setInitialSize(10);
         ds.setMaxTotal(50);
         ds.setMinIdle(5);

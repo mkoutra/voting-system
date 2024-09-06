@@ -4,7 +4,6 @@ import personal.App;
 import personal.dao.IUserDAO;
 import personal.dao.UserDAOImpl;
 import personal.dao.exceptions.UserDAOException;
-import personal.dto.UserInsertDTO;
 import personal.dto.UserLoginDTO;
 import personal.dto.UserReadOnlyDTO;
 import personal.model.User;
@@ -18,7 +17,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.*;
-import java.util.Date;
 import javax.swing.border.BevelBorder;
 
 public class MainMenuFrame extends JFrame {
@@ -43,7 +41,7 @@ public class MainMenuFrame extends JFrame {
 					if (userDAO.usernameExists("admin")) {
 						return;
 					}
-					createAdminAccount();
+					userService.createAdminAccount();
 				} catch (UserDAOException e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(null, "Admin insertion error",
@@ -229,18 +227,5 @@ public class MainMenuFrame extends JFrame {
 		usernameText.setText("");
 		passwordField.setText("");
 		failedLoginText.setVisible(false);
-	}
-
-	private void createAdminAccount() throws UserDAOException {
-		UserInsertDTO insertDTO = new UserInsertDTO();
-		insertDTO.setUsername("admin");
-		insertDTO.setEmail("-");
-		insertDTO.setFirstname("Admin");
-		insertDTO.setLastname("Admin");
-		insertDTO.setDateOfBirth(new Date(System.currentTimeMillis()));
-		insertDTO.setPassword("Aa1234567*");
-		insertDTO.setReEnteredPassword("Aa1234567*");
-
-		userService.insertUser(insertDTO);
 	}
 }

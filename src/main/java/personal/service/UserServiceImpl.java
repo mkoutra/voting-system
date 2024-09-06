@@ -14,8 +14,11 @@ import personal.model.User;
 import personal.service.exceptions.CandidateNotFoundException;
 import personal.service.exceptions.UserNotFoundException;
 import personal.service.exceptions.WrongPasswordException;
+import personal.service.util.ConfigFileUtil;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 public class UserServiceImpl implements IUserService {
     private final IUserDAO userDAO;
@@ -43,10 +46,10 @@ public class UserServiceImpl implements IUserService {
     @Override
     public User getUserByUsername(String username) throws UserNotFoundException, UserDAOException {
         try {
-           if (!userDAO.usernameExists(username)) {
-               throw new UserNotFoundException("Username: " + username + " does not exist.");
-           }
-           return userDAO.getByUsername(username);
+            if (!userDAO.usernameExists(username)) {
+                throw new UserNotFoundException("Username: " + username + " does not exist.");
+            }
+            return userDAO.getByUsername(username);
         } catch (UserDAOException e1) {
             throw new UserDAOException("SQL error in get user by username: " + username);
         }
@@ -107,6 +110,7 @@ public class UserServiceImpl implements IUserService {
 
     /**
      * Returns empty list if there are no users
+     *
      * @return
      * @throws UserDAOException
      */
@@ -117,6 +121,7 @@ public class UserServiceImpl implements IUserService {
 
     /**
      * Returns empty list if there are no users
+     *
      * @param votedCid
      * @return
      * @throws UserDAOException
@@ -145,7 +150,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public User changePassword(User user, ChangePasswordDTO dto)
-            throws UserNotFoundException,WrongPasswordException, UserDAOException {
+            throws UserNotFoundException, WrongPasswordException, UserDAOException {
         if (!userDAO.usernameExists(user.getUsername())) {
             throw new UserNotFoundException("User: " + user.getUsername() + " was not found.");
         }
@@ -163,5 +168,32 @@ public class UserServiceImpl implements IUserService {
             user.setPassword(BCrypt.hashpw(dto.getCurrentPassword(), BCrypt.gensalt(12)));
             throw new UserDAOException("SQL error in change Password");
         }
+    }
+
+    @Override
+    public void createAdminAccount() throws UserDAOException {
+        UserInsertDTO insertDTO = createAdminInsertDTO();
+        insertUser(insertDTO);
+    }
+
+    /**
+     * Reads the admin information from config.properties file
+     * and returns an UserInsertDTO object.
+     *
+     * @return The UserInsertDTO with the admin information
+     */
+    private UserInsertDTO createAdminInsertDTO() {
+        UserInsertDTO insertDTO = new UserInsertDTO();
+        Properties props = ConfigFileUtil.getPropertiesInstance();
+
+        insertDTO.setUsername("admin");
+        insertDTO.setEmail(props.getProperty("admin.email"));
+        insertDTO.setFirstname(props.getProperty("admin.firstname"));
+        insertDTO.setLastname(props.getProperty("admin.lastname"));
+        insertDTO.setDateOfBirth(new Date(System.currentTimeMillis()));
+        insertDTO.setPassword(props.getProperty("admin.password"));
+        insertDTO.setReEnteredPassword(props.getProperty("admin.initial_password"));
+
+        return insertDTO;
     }
 }
