@@ -8,11 +8,9 @@ import java.util.Date;
  *
  * @author Michail E. Koutrakis
  */
-public class UserInsertDTO {
+public class UserInsertDTO extends NamesDTO {
     private String username;
     private String email;
-    private String firstname;
-    private String lastname;
     private Date dateOfBirth;
     private String password;
     private String reEnteredPassword;
@@ -21,10 +19,9 @@ public class UserInsertDTO {
 
     public UserInsertDTO(String username, String email, String firstname, String lastname,
                          Date dateOfBirth, String password, String reEnteredPassword) {
+        super(firstname, lastname);
         this.username = username;
         this.email = email;
-        this.firstname = firstname;
-        this.lastname = lastname;
         this.dateOfBirth = dateOfBirth;
         this.password = password;
         this.reEnteredPassword = reEnteredPassword;
@@ -44,22 +41,6 @@ public class UserInsertDTO {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
     }
 
     public Date getDateOfBirth() {
@@ -91,8 +72,8 @@ public class UserInsertDTO {
         return "UserInsertDTO{" +
                 "username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", firstname='" + firstname + '\'' +
-                ", lastname='" + lastname + '\'' +
+                ", firstname='" + super.getFirstname() + '\'' +
+                ", lastname='" + super.getLastname() + '\'' +
                 ", dateOfBirth=" + dateOfBirth +
                 ", password='" + password + '\'' +
                 ", reEnteredPassword='" + reEnteredPassword + '\'' +

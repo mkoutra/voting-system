@@ -6,17 +6,14 @@ package personal.dto;
  *
  * @author Michail E. Koutrakis
  */
-public class UserReadOnlyDTO {
+public class UserReadOnlyDTO extends NamesDTO {
     private String username;
-    private String firstname;
-    private String lastname;
 
     public UserReadOnlyDTO() {}
 
     public UserReadOnlyDTO(String username, String firstname, String lastname) {
+        super(firstname, lastname);
         this.username = username;
-        this.firstname = firstname;
-        this.lastname = lastname;
     }
 
     public String getUsername() {
@@ -27,19 +24,4 @@ public class UserReadOnlyDTO {
         this.username = username;
     }
 
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }
 }

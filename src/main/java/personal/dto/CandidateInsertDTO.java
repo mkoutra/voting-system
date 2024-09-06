@@ -6,39 +6,19 @@ package personal.dto;
  *
  * @author Michail E. Koutrakis
  */
-public class CandidateInsertDTO {
-    private String firstname;
-    private String lastname;
-
+public class CandidateInsertDTO extends NamesDTO {
     public CandidateInsertDTO() {
     }
 
     public CandidateInsertDTO(String firstname, String lastname) {
-        this.firstname = firstname;
-        this.lastname = lastname;
-    }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
+        super(firstname, lastname);
     }
 
     @Override
     public String toString() {
         return "CandidateInsertDTO{" +
-                "firstname='" + firstname + '\'' +
-                ", lastname='" + lastname + '\'' +
+                "firstname='" + super.getFirstname() + '\'' +
+                ", lastname='" + super.getLastname() + '\'' +
                 '}';
     }
 }

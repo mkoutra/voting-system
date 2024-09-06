@@ -6,7 +6,7 @@ package personal.dto;
  *
  * @author Michail E. Koutrakis
  */
-public class CandidateUpdateDTO {
+public class CandidateUpdateDTO extends NamesDTO {
     private Integer cid;
     private String firstname;
     private String lastname;
@@ -15,9 +15,8 @@ public class CandidateUpdateDTO {
     }
 
     public CandidateUpdateDTO(Integer cid, String firstname, String lastname) {
+        super(firstname, lastname);
         this.cid = cid;
-        this.firstname = firstname;
-        this.lastname = lastname;
     }
 
     public Integer getCid() {
@@ -28,28 +27,12 @@ public class CandidateUpdateDTO {
         this.cid = cid;
     }
 
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }
-
     @Override
     public String toString() {
         return "CandidateUpdateDTO{" +
                 "cid=" + cid +
-                ", firstname='" + firstname + '\'' +
-                ", lastname='" + lastname + '\'' +
+                ", firstname='" + super.getFirstname() + '\'' +
+                ", lastname='" + super.getLastname() + '\'' +
                 '}';
     }
 }
