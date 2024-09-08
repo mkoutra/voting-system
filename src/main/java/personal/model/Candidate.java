@@ -6,7 +6,7 @@ package personal.model;
  *
  * @author Michail E. Koutrakis
  */
-public class Candidate {
+public class Candidate implements IHasFullName {
     private Integer cid;
     private String firstname;
     private String lastname;
@@ -34,18 +34,22 @@ public class Candidate {
         this.cid = cid;
     }
 
+    @Override
     public String getFirstname() {
         return firstname;
     }
 
+    @Override
     public void setFirstname(String firstname) {
         this.firstname = firstname;
     }
 
+    @Override
     public String getLastname() {
         return lastname;
     }
 
+    @Override
     public void setLastname(String lastname) {
         this.lastname = lastname;
     }

@@ -8,7 +8,7 @@ import java.util.Date;
  *
  * @author Michail E. Koutrakis
  */
-public class User {
+public class User implements IHasFullName {
     private Integer uid;
     private String username;
     private String password;
@@ -79,18 +79,22 @@ public class User {
         this.email = email;
     }
 
+    @Override
     public String getFirstname() {
         return firstname;
     }
 
+    @Override
     public void setFirstname(String firstname) {
         this.firstname = firstname;
     }
 
+    @Override
     public String getLastname() {
         return lastname;
     }
 
+    @Override
     public void setLastname(String lastname) {
         this.lastname = lastname;
     }

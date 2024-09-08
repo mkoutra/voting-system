@@ -1,0 +1,4 @@
+- Sep 8, 2024
+  - CandidatesWithVotesReadOnlyDTO inherits from CandidateReadOnlyDTO
+  - Create IHasFullName interface created.
+  - IHasFullName implemented by User, Candidate and NameDTO

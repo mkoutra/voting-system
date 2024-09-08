@@ -6,24 +6,14 @@ package personal.dto;
  *
  * @author Michail E. Koutrakis
  */
-public class CandidatesWithVotesReadOnlyDTO extends NamesDTO {
-    private Integer cid;
+public class CandidatesWithVotesReadOnlyDTO extends CandidateReadOnlyDTO {
     private Integer totalVotes;
 
     public CandidatesWithVotesReadOnlyDTO() {}
 
     public CandidatesWithVotesReadOnlyDTO(Integer cid, String firstname, String lastname, Integer totalVotes) {
-        super(firstname, lastname);
-        this.cid = cid;
+        super(cid, firstname, lastname);
         this.totalVotes = totalVotes;
-    }
-
-    public Integer getCid() {
-        return cid;
-    }
-
-    public void setCid(Integer cid) {
-        this.cid = cid;
     }
 
     public Integer getTotalVotes() {
@@ -36,7 +26,7 @@ public class CandidatesWithVotesReadOnlyDTO extends NamesDTO {
 
     @Override
     public String toString() {
-        return cid.toString() + "," + super.getFirstname() + ","
+        return super.getCid().toString() + "," + super.getFirstname() + ","
                 + super.getLastname() + "," + totalVotes.toString();
     }
 }
