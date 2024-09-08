@@ -57,12 +57,13 @@ public class CandidatesFrame extends JFrame {
 			@Override
 			public void windowActivated(WindowEvent e) {
 				candidatesWithVotesReadOnlyDTOs = createCandidatesWithVotesReadOnlyDTO();
-				buildCandidatesTable(candidatesWithVotesReadOnlyDTOs);
+				renderCandidatesTable(candidatesWithVotesReadOnlyDTOs);
 			}
 			@Override
 			public void windowOpened(WindowEvent e) {
+				cleanAll();
 				candidatesWithVotesReadOnlyDTOs = createCandidatesWithVotesReadOnlyDTO();
-				buildCandidatesTable(candidatesWithVotesReadOnlyDTOs);
+				renderCandidatesTable(candidatesWithVotesReadOnlyDTOs);
 			}
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -193,7 +194,7 @@ public class CandidatesFrame extends JFrame {
 
 					// Update candidates table
 					candidatesWithVotesReadOnlyDTOs = createCandidatesWithVotesReadOnlyDTO();
-					buildCandidatesTable(candidatesWithVotesReadOnlyDTOs);
+					renderCandidatesTable(candidatesWithVotesReadOnlyDTOs);
 
 					cleanEditCandidate();
 
@@ -250,7 +251,7 @@ public class CandidatesFrame extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 				if (candidatesTable.isEnabled()) {
 					selectedCandidateUpdateDTO = createCandidateUpdateDTOFromTable();
-					buildSelectedCandidate(selectedCandidateUpdateDTO);
+					renderSelectedCandidate(selectedCandidateUpdateDTO);
 					deleteBtn.setEnabled(true);
 					updateBtn.setEnabled(true);
 				}
@@ -317,7 +318,7 @@ public class CandidatesFrame extends JFrame {
 
 					// Update candidates table
 					candidatesWithVotesReadOnlyDTOs = createCandidatesWithVotesReadOnlyDTO();
-					buildCandidatesTable(candidatesWithVotesReadOnlyDTOs);
+					renderCandidatesTable(candidatesWithVotesReadOnlyDTOs);
 
 					// Clean texts
 					cleanInsertCandidate();
@@ -344,14 +345,14 @@ public class CandidatesFrame extends JFrame {
 		contentPane.add(selectACandidateText);
 	}
 
-	private void buildCandidatesTable(List<CandidatesWithVotesReadOnlyDTO> readOnlyDTOs) {
+	// RENDERING
+
+	private void renderCandidatesTable(List<CandidatesWithVotesReadOnlyDTO> readOnlyDTOs) {
 		Vector<String> vector;
 
-		// Remove table rows
-		for (int i = candidatesModel.getRowCount() - 1; i >= 0; i--) {
-			candidatesModel.removeRow(i);
-		}
+		cleanTable();
 
+		// Sort based on the lastname
 		readOnlyDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getLastname));
 
 		// Add to model
@@ -366,22 +367,17 @@ public class CandidatesFrame extends JFrame {
 		}
 	}
 
-	private List<CandidatesWithVotesReadOnlyDTO> mapToCandidatesWithVotesReadOnlyDTO(Map<Candidate, Integer> candidatesWithVotes) {
-		List<CandidatesWithVotesReadOnlyDTO> candidatesWithVotesArray = new ArrayList<>();
-		CandidatesWithVotesReadOnlyDTO dto = null;
+	private void renderSelectedCandidate(CandidateUpdateDTO selectedCandidateUpdateDTO) {
+		String cid = Integer.toString(selectedCandidateUpdateDTO.getCid());
+		String firstname = selectedCandidateUpdateDTO.getFirstname();
+		String lastname = selectedCandidateUpdateDTO.getLastname();
 
-		for (Candidate candidate : candidatesWithVotes.keySet()) {
-			dto = new CandidatesWithVotesReadOnlyDTO();
-			dto.setCid(candidate.getCid());
-			dto.setFirstname(candidate.getFirstname());
-			dto.setLastname(candidate.getLastname());
-			dto.setTotalVotes(candidatesWithVotes.get(candidate));
-
-			candidatesWithVotesArray.add(dto);
-		}
-
-		return candidatesWithVotesArray;
+		candidateId.setText(cid);
+		candidateFirstnameText.setText(firstname);
+		candidateLastnameText.setText(lastname);
 	}
+
+	// DTOs
 
 	private List<CandidatesWithVotesReadOnlyDTO> createCandidatesWithVotesReadOnlyDTO() {
 		try {
@@ -394,32 +390,41 @@ public class CandidatesFrame extends JFrame {
 		}
 	}
 
-	private CandidateUpdateDTO createCandidateUpdateDTOFromTable() {
-		CandidateUpdateDTO candidateUpdateDTO = new CandidateUpdateDTO();
-//		candidateUpdateDTO.setCid(Integer.parseInt((String) candidatesModel.getValueAt(candidatesTable.getSelectedRow(), 0)));
-//		candidateUpdateDTO.setFirstname((String) candidatesModel.getValueAt(candidatesTable.getSelectedRow(), 1));
-//		candidateUpdateDTO.setLastname((String) candidatesModel.getValueAt(candidatesTable.getSelectedRow(), 2));
+	private List<CandidatesWithVotesReadOnlyDTO> mapToCandidatesWithVotesReadOnlyDTO(Map<Candidate, Integer> candidatesWithVotes) {
+		List<CandidatesWithVotesReadOnlyDTO> candidatesWithVotesArray = new ArrayList<>();
+		CandidatesWithVotesReadOnlyDTO dto;
 
-		candidateUpdateDTO.setCid(Integer.parseInt((String) candidatesTable.getValueAt(candidatesTable.getSelectedRow(), 0)));
-		candidateUpdateDTO.setFirstname((String) candidatesTable.getValueAt(candidatesTable.getSelectedRow(), 1));
-		candidateUpdateDTO.setLastname((String) candidatesTable.getValueAt(candidatesTable.getSelectedRow(), 2));
+		for (Candidate candidate : candidatesWithVotes.keySet()) {
+			dto = new CandidatesWithVotesReadOnlyDTO(
+					candidate.getCid(),
+					candidate.getFirstname(),
+					candidate.getLastname(),
+					candidatesWithVotes.get(candidate)
+			);
+			candidatesWithVotesArray.add(dto);
+		}
 
-		return candidateUpdateDTO;
+		return candidatesWithVotesArray;
 	}
 
-	private void buildSelectedCandidate(CandidateUpdateDTO selectedCandidateUpdateDTO) {
-		candidateId.setText(Integer.toString(selectedCandidateUpdateDTO.getCid()));
-		candidateFirstnameText.setText(selectedCandidateUpdateDTO.getFirstname());
-		candidateLastnameText.setText(selectedCandidateUpdateDTO.getLastname());
+	private CandidateUpdateDTO createCandidateUpdateDTOFromTable() {
+		// Get data from the selected row directly from the table instead of the model.
+		Integer cidFromTable = Integer.parseInt((String) candidatesTable.getValueAt(candidatesTable.getSelectedRow(), 0));
+		String firstnameFromTable = (String) candidatesTable.getValueAt(candidatesTable.getSelectedRow(), 1);
+		String lastnameFromTable = (String) candidatesTable.getValueAt(candidatesTable.getSelectedRow(), 2);
+
+		return new CandidateUpdateDTO(cidFromTable, firstnameFromTable, lastnameFromTable);
 	}
 
 	private CandidateInsertDTO createCandidateInsertDTO() {
-		CandidateInsertDTO candidateInsertDTO = new CandidateInsertDTO();
-		candidateInsertDTO.setFirstname(insertFirstnameText.getText().trim());
-		candidateInsertDTO.setLastname(insertLastnameText.getText().trim());
+		// Data binding
+		String inputFirstname = insertFirstnameText.getText().trim();
+		String inputLastname = insertLastnameText.getText().trim();
 
-		return candidateInsertDTO;
+		return new CandidateInsertDTO(inputFirstname, inputLastname);
 	}
+
+	//	CLEANING
 
 	private void cleanEditCandidate() {
 		candidateId.setText("");

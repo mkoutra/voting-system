@@ -8,11 +8,8 @@ package personal.dto;
  */
 public class CandidateUpdateDTO extends NamesDTO {
     private Integer cid;
-    private String firstname;
-    private String lastname;
 
-    public CandidateUpdateDTO() {
-    }
+    public CandidateUpdateDTO() {}
 
     public CandidateUpdateDTO(Integer cid, String firstname, String lastname) {
         super(firstname, lastname);
