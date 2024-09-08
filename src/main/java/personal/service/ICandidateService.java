@@ -10,6 +10,7 @@ import personal.service.exceptions.CandidateIOException;
 import personal.service.exceptions.CandidateNotFoundException;
 
 import java.io.File;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -90,4 +91,6 @@ public interface ICandidateService {
      * @throws CandidateIOException If an error occurs during the file operation.
      */
     void saveVotingResults(List<CandidatesWithVotesReadOnlyDTO> candidatesDTOs, File file) throws CandidateIOException;
+
+    void sortCandidatesWithVotesReadonlyDTOs(List<CandidatesWithVotesReadOnlyDTO> candidatesDTOs, int sortByIndex);
 }

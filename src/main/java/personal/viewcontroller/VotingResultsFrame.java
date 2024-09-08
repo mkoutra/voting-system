@@ -47,15 +47,15 @@ public class VotingResultsFrame extends JFrame {
 			@Override
 			public void windowOpened(WindowEvent e) {
 				candidatesWithVotesReadOnlyDTOs = createCandidatesWithVotesReadOnlyDTO();
-				sortCandidatesTable(0);
-				buildCandidatesTable(candidatesWithVotesReadOnlyDTOs);
+				sortCandidates(0);
+				renderCandidatesTable(candidatesWithVotesReadOnlyDTOs);
 			}
 
 			@Override
 			public void windowActivated(WindowEvent e) {
 				candidatesWithVotesReadOnlyDTOs = createCandidatesWithVotesReadOnlyDTO();
-				sortCandidatesTable(0);
-				buildCandidatesTable(candidatesWithVotesReadOnlyDTOs);
+				sortCandidates(0);
+				renderCandidatesTable(candidatesWithVotesReadOnlyDTOs);
 			}
 
 			@Override
@@ -120,7 +120,7 @@ public class VotingResultsFrame extends JFrame {
 					File file = fixFileExtension(fileChooser.getSelectedFile());
 					try {
 						Map<Candidate, Integer> candidatesWithVotes = candidateService.getAllCandidatesWithVotes();
-						List<CandidatesWithVotesReadOnlyDTO> readOnlyDTOs = mapToCandidatesWithVotesReadOnlyDTO(candidatesWithVotes);
+						List<CandidatesWithVotesReadOnlyDTO> readOnlyDTOs = mapToCandidatesWithVotesReadOnlyDTOList(candidatesWithVotes);
 						candidateService.saveVotingResults(readOnlyDTOs, file);
 					} catch (CandidateIOException | CandidateDAOException e1) {
 						JOptionPane.showMessageDialog(contentPane, "An error occurred while saving the file",
@@ -166,52 +166,34 @@ public class VotingResultsFrame extends JFrame {
 		comboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int optionInt = comboBox.getSelectedIndex();
-				sortCandidatesTable(optionInt);
-				buildCandidatesTable(candidatesWithVotesReadOnlyDTOs);
+				sortCandidates(optionInt);
+				renderCandidatesTable(candidatesWithVotesReadOnlyDTOs);
 			}
 		});
 	}
 
-	private void buildCandidatesTable(List<CandidatesWithVotesReadOnlyDTO> readOnlyDTOs) {
-		Vector<String> vector;
+	private void renderCandidatesTable(List<CandidatesWithVotesReadOnlyDTO> dtos) {
+		RenderingUtil.renderCandidatesModelTable(dtos, resultsModel);
+	}
 
-		// Remove table rows
-		for (int i = resultsModel.getRowCount() - 1; i >= 0; i--) {
-			resultsModel.removeRow(i);
-		}
+	private void sortCandidates(Integer sortByIndex) {
+		candidateService.sortCandidatesWithVotesReadonlyDTOs(candidatesWithVotesReadOnlyDTOs, sortByIndex);
+	}
 
-		// Add to model
-		for (CandidatesWithVotesReadOnlyDTO dto : readOnlyDTOs) {
-			vector = new Vector<>(4);
-			vector.add(Integer.toString(dto.getCid()));
-			vector.add(dto.getFirstname());
-			vector.add(dto.getLastname());
-			vector.add(String.valueOf(dto.getTotalVotes()));
-
-			resultsModel.addRow(vector);
+	private List<CandidatesWithVotesReadOnlyDTO> createCandidatesWithVotesReadOnlyDTO() {
+		try {
+			Map<Candidate, Integer> candidatesWithVotes = candidateService.getAllCandidatesWithVotes();
+			return mapToCandidatesWithVotesReadOnlyDTOList(candidatesWithVotes);
+		} catch (CandidateDAOException e) {
+			JOptionPane.showMessageDialog(null, "Error in retrieving the results",
+					"Results table error", JOptionPane.ERROR_MESSAGE);
+			return null;
 		}
 	}
 
-	private void sortCandidatesTable(Integer sortByIndex) {
-		switch (sortByIndex) {
-			case 0:
-				candidatesWithVotesReadOnlyDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getTotalVotes).reversed());
-				break;
-			case 1:
-				candidatesWithVotesReadOnlyDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getFirstname));
-				break;
-			case 2:
-				candidatesWithVotesReadOnlyDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getLastname));
-				break;
-			case 3:
-				candidatesWithVotesReadOnlyDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getCid));
-				break;
-		}
-	}
-
-	private List<CandidatesWithVotesReadOnlyDTO> mapToCandidatesWithVotesReadOnlyDTO(Map<Candidate, Integer> candidatesWithVotes) {
+	private List<CandidatesWithVotesReadOnlyDTO> mapToCandidatesWithVotesReadOnlyDTOList(Map<Candidate, Integer> candidatesWithVotes) {
 		List<CandidatesWithVotesReadOnlyDTO> candidatesWithVotesArray = new ArrayList<>();
-		CandidatesWithVotesReadOnlyDTO dto = null;
+		CandidatesWithVotesReadOnlyDTO dto;
 
 		for (Candidate candidate : candidatesWithVotes.keySet()) {
 			dto = new CandidatesWithVotesReadOnlyDTO();
@@ -224,17 +206,6 @@ public class VotingResultsFrame extends JFrame {
 		}
 
 		return candidatesWithVotesArray;
-	}
-
-	private List<CandidatesWithVotesReadOnlyDTO> createCandidatesWithVotesReadOnlyDTO() {
-		try {
-			Map<Candidate, Integer> candidatesWithVotes = candidateService.getAllCandidatesWithVotes();
-			return mapToCandidatesWithVotesReadOnlyDTO(candidatesWithVotes);
-		} catch (CandidateDAOException e) {
-			JOptionPane.showMessageDialog(null, "Error in retrieving the results",
-					"Results table error", JOptionPane.ERROR_MESSAGE);
-			return null;
-		}
 	}
 
 	private File fixFileExtension(File file) {

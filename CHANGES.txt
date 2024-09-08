@@ -2,3 +2,10 @@
   - CandidatesWithVotesReadOnlyDTO inherits from CandidateReadOnlyDTO
   - Create IHasFullName interface created.
   - IHasFullName implemented by User, Candidate and NameDTO
+
+  - Create RenderingUtil utility class
+  - Insert sortCandidatesWithVotesReadonlyDTOs to Candidate service layer
+  - In VotingResultsFrame:
+    - Rename buildCandidatesTable to renderCandidatesTable
+    - User the RenderUtil.renderCandidatesModelTable in renderCandidatesTable
+    - Use the sorting method from service layer

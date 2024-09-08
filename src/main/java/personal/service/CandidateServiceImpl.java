@@ -92,6 +92,24 @@ public class CandidateServiceImpl implements ICandidateService {
         }
     }
 
+    @Override
+    public void sortCandidatesWithVotesReadonlyDTOs(List<CandidatesWithVotesReadOnlyDTO> candidatesDTOs, int sortByIndex)  {
+        switch (sortByIndex) {
+            case 0:
+                candidatesDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getTotalVotes).reversed());
+                break;
+            case 1:
+                candidatesDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getFirstname));
+                break;
+            case 2:
+                candidatesDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getLastname));
+                break;
+            case 3:
+                candidatesDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getCid));
+                break;
+        }
+    }
+
     private Candidate mapInsertDTOToCandidate(CandidateInsertDTO dto) {
         Candidate candidate = new Candidate();
         candidate.setFirstname(dto.getFirstname());
@@ -106,4 +124,6 @@ public class CandidateServiceImpl implements ICandidateService {
         candidate.setLastname(dto.getLastname());
         return candidate;
     }
+
+
 }
