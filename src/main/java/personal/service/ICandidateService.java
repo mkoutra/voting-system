@@ -93,4 +93,20 @@ public interface ICandidateService {
     void saveVotingResults(List<CandidatesWithVotesReadOnlyDTO> candidatesDTOs, File file) throws CandidateIOException;
 
     void sortCandidatesWithVotesReadonlyDTOs(List<CandidatesWithVotesReadOnlyDTO> candidatesDTOs, int sortByIndex);
+
+    /**
+     * Ensures the given file has either a '.csv' or '.txt' extension.
+     * If the file does not have one of these extensions, the {@code defaultExt}
+     * is appended to the filename, and a new {@link File} object
+     * is returned with the updated filename.
+     *
+     * @param file          The file whose filename is to be checked.
+     * @param defaultExt    The extension to append if the file does not have a 'csv'
+     *                      or 'txt' extension. This should be provided without a dot
+     *                      (e.g., 'csv' instead of '.csv').
+     * @return              A {@link File} with a valid extension, either the
+     *                      original or a new file object.
+     * @throws CandidateIOException if {@code file} or {@code defaultExt} is null.
+     */
+    File fixFileExtension(File file, String defaultExt) throws CandidateIOException;
 }

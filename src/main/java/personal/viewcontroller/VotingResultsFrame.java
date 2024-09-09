@@ -3,12 +3,11 @@ package personal.viewcontroller;
 import personal.App;
 import personal.dao.CandidateDAOImpl;
 import personal.dao.ICandidateDAO;
-import personal.dao.exceptions.CandidateDAOException;
 import personal.dto.CandidatesWithVotesReadOnlyDTO;
-import personal.model.Candidate;
 import personal.service.CandidateServiceImpl;
 import personal.service.ICandidateService;
 import personal.service.exceptions.CandidateIOException;
+import personal.viewcontroller.util.CandidatesWithVotesDTOsUtil;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -46,14 +45,14 @@ public class VotingResultsFrame extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent e) {
-				candidatesWithVotesReadOnlyDTOs = createCandidatesWithVotesReadOnlyDTO();
+				candidatesWithVotesReadOnlyDTOs = CandidatesWithVotesDTOsUtil.createList();
 				sortCandidates(0);
 				renderCandidatesTable(candidatesWithVotesReadOnlyDTOs);
 			}
 
 			@Override
 			public void windowActivated(WindowEvent e) {
-				candidatesWithVotesReadOnlyDTOs = createCandidatesWithVotesReadOnlyDTO();
+				candidatesWithVotesReadOnlyDTOs = CandidatesWithVotesDTOsUtil.createList();
 				sortCandidates(0);
 				renderCandidatesTable(candidatesWithVotesReadOnlyDTOs);
 			}
@@ -92,7 +91,6 @@ public class VotingResultsFrame extends JFrame {
 		));
 		scrollPane.setViewportView(resultsTable);
 		resultsModel = (DefaultTableModel) resultsTable.getModel();
-//		resultsTable.setAutoCreateRowSorter(true);
 
 		JPanel votingResultsPanel = new JPanel();
 		votingResultsPanel.setLayout(null);
@@ -113,20 +111,7 @@ public class VotingResultsFrame extends JFrame {
 		JButton saveResultsBtn = new JButton("Save Results");
 		saveResultsBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser fileChooser = new JFileChooser();
-				fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("CSV Files", "csv"));
-
-				if (fileChooser.showSaveDialog(contentPane) == JFileChooser.APPROVE_OPTION) {
-					File file = fixFileExtension(fileChooser.getSelectedFile());
-					try {
-						Map<Candidate, Integer> candidatesWithVotes = candidateService.getAllCandidatesWithVotes();
-						List<CandidatesWithVotesReadOnlyDTO> readOnlyDTOs = mapToCandidatesWithVotesReadOnlyDTOList(candidatesWithVotes);
-						candidateService.saveVotingResults(readOnlyDTOs, file);
-					} catch (CandidateIOException | CandidateDAOException e1) {
-						JOptionPane.showMessageDialog(contentPane, "An error occurred while saving the file",
-								"File Saving Error", JOptionPane.ERROR_MESSAGE);
-					}
-				}
+				onSaveResultsClicked();
 			}
 		});
 		saveResultsBtn.setBounds(0, 0, 125, 25);
@@ -137,8 +122,7 @@ public class VotingResultsFrame extends JFrame {
 		closeBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				App.getVotingWindow().setEnabled(true);
-				dispose();
+				onCloseClicked();
 			}
 		});
 		closeBtn.setBounds(0, 35, 125, 25);
@@ -165,9 +149,7 @@ public class VotingResultsFrame extends JFrame {
 		sortByModel = (DefaultComboBoxModel) comboBox.getModel();
 		comboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int optionInt = comboBox.getSelectedIndex();
-				sortCandidates(optionInt);
-				renderCandidatesTable(candidatesWithVotesReadOnlyDTOs);
+				onComboBoxActivation();
 			}
 		});
 	}
@@ -180,39 +162,30 @@ public class VotingResultsFrame extends JFrame {
 		candidateService.sortCandidatesWithVotesReadonlyDTOs(candidatesWithVotesReadOnlyDTOs, sortByIndex);
 	}
 
-	private List<CandidatesWithVotesReadOnlyDTO> createCandidatesWithVotesReadOnlyDTO() {
-		try {
-			Map<Candidate, Integer> candidatesWithVotes = candidateService.getAllCandidatesWithVotes();
-			return mapToCandidatesWithVotesReadOnlyDTOList(candidatesWithVotes);
-		} catch (CandidateDAOException e) {
-			JOptionPane.showMessageDialog(null, "Error in retrieving the results",
-					"Results table error", JOptionPane.ERROR_MESSAGE);
-			return null;
+	private void onSaveResultsClicked() {
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("CSV Files", "csv"));
+
+		if (fileChooser.showSaveDialog(contentPane) == JFileChooser.APPROVE_OPTION) {
+			try {
+				File file = candidateService.fixFileExtension(fileChooser.getSelectedFile(), "csv");
+				List<CandidatesWithVotesReadOnlyDTO> readOnlyDTOs = CandidatesWithVotesDTOsUtil.createList();
+				candidateService.saveVotingResults(readOnlyDTOs, file);
+			} catch (CandidateIOException e1) {
+				JOptionPane.showMessageDialog(contentPane, "An error occurred while saving the file",
+						"File Saving Error", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 
-	private List<CandidatesWithVotesReadOnlyDTO> mapToCandidatesWithVotesReadOnlyDTOList(Map<Candidate, Integer> candidatesWithVotes) {
-		List<CandidatesWithVotesReadOnlyDTO> candidatesWithVotesArray = new ArrayList<>();
-		CandidatesWithVotesReadOnlyDTO dto;
-
-		for (Candidate candidate : candidatesWithVotes.keySet()) {
-			dto = new CandidatesWithVotesReadOnlyDTO();
-			dto.setCid(candidate.getCid());
-			dto.setFirstname(candidate.getFirstname());
-			dto.setLastname(candidate.getLastname());
-			dto.setTotalVotes(candidatesWithVotes.get(candidate));
-
-			candidatesWithVotesArray.add(dto);
-		}
-
-		return candidatesWithVotesArray;
+	private void onCloseClicked() {
+		App.getVotingWindow().setEnabled(true);
+		dispose();
 	}
 
-	private File fixFileExtension(File file) {
-		File correctExtensionFile = file;
-		if (!(file.getAbsolutePath().endsWith(".csv") || file.getAbsolutePath().endsWith(".txt"))) {
-			correctExtensionFile = new File(file.getAbsolutePath() + ".csv");
-		}
-		return correctExtensionFile;
+	private void onComboBoxActivation() {
+		int optionInt = comboBox.getSelectedIndex();
+		sortCandidates(optionInt);
+		renderCandidatesTable(candidatesWithVotesReadOnlyDTOs);
 	}
 }

@@ -110,6 +110,17 @@ public class CandidateServiceImpl implements ICandidateService {
         }
     }
 
+    @Override
+    public File fixFileExtension(File file, String defaultExt) throws CandidateIOException {
+        File correctExtensionFile = file;
+        if (file == null || defaultExt == null) throw new CandidateIOException("Error in file extension.");
+
+        if (!(file.getAbsolutePath().endsWith(".csv") || file.getAbsolutePath().endsWith(".txt"))) {
+            correctExtensionFile = new File(file.getAbsolutePath() + "." + defaultExt);
+        }
+        return correctExtensionFile;
+    }
+
     private Candidate mapInsertDTOToCandidate(CandidateInsertDTO dto) {
         Candidate candidate = new Candidate();
         candidate.setFirstname(dto.getFirstname());
@@ -124,6 +135,4 @@ public class CandidateServiceImpl implements ICandidateService {
         candidate.setLastname(dto.getLastname());
         return candidate;
     }
-
-
 }

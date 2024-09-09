@@ -9,3 +9,9 @@
     - Rename buildCandidatesTable to renderCandidatesTable
     - User the RenderUtil.renderCandidatesModelTable in renderCandidatesTable
     - Use the sorting method from service layer
+
+- Sep 9, 2024
+  - CandidatesWithVotesDTOUtil class created to handle candidatesWithVotesDTOs
+  - Move fixFileExtension to candidateService.
+  - In VotingResultsFarme:
+    - Create onSaveResultsClicked(), onCloseClicked() and onComboBoxActivation()
