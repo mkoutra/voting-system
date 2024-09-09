@@ -9,13 +9,13 @@ import personal.dao.exceptions.CandidateDAOException;
 import personal.dao.exceptions.UserDAOException;
 import personal.dto.*;
 import personal.dto.CandidateUpdateDTO;
-import personal.model.Candidate;
 import personal.service.CandidateServiceImpl;
 import personal.service.ICandidateService;
 import personal.service.IUserService;
 import personal.service.UserServiceImpl;
 import personal.service.exceptions.CandidateNotFoundException;
 import personal.validator.CandidateDTOValidator;
+import personal.viewcontroller.util.CandidatesWithVotesDTOsUtil;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -47,6 +47,8 @@ public class CandidatesFrame extends JFrame {
 	private DefaultTableModel candidatesModel;
 	private List<CandidatesWithVotesReadOnlyDTO> candidatesWithVotesReadOnlyDTOs;
 	private CandidateUpdateDTO selectedCandidateUpdateDTO;
+	private JButton updateBtn;
+	private JButton deleteBtn;
 
 	/**
 	 * Create the frame.
@@ -122,41 +124,11 @@ public class CandidatesFrame extends JFrame {
 		candidateLastnameText.setBounds(12, 126, 148, 19);
 		editCandidatePanel.add(candidateLastnameText);
 		
-		JButton deleteBtn = new JButton("Delete");
+		deleteBtn = new JButton("Delete");
 		deleteBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (candidateId.getText().isEmpty()) {
-					return;
-				}
-
-				Integer cidToDelete = Integer.parseInt(candidateId.getText());
-
-				try {
-					int response = JOptionPane.showConfirmDialog(null,
-							"Are you sure you want to delete the candidate with ID: " + cidToDelete + "? This action cannot be undone.",
-							"Delete Confirmation", JOptionPane.YES_NO_OPTION);
-
-					if (response == JOptionPane.YES_OPTION) {
-						// Remove candidates from users that had voted him/her
-						userService.removeAllVotesOfSpecificCid(cidToDelete);
-
-						// Remove candidate from candidates table
-						candidateService.deleteCandidate(cidToDelete);
-
-						// Clean Edit candidate
-						cleanEditCandidate();
-					}
-				} catch (CandidateDAOException | UserDAOException e1) {
-					JOptionPane.showMessageDialog(null, "Error in storage",
-							"SQL-Deletion error", JOptionPane.ERROR_MESSAGE);
-					cleanEditCandidate();
-				} catch (CandidateNotFoundException e2) {
-					JOptionPane.showMessageDialog(null,
-							"Candidate with id: " + cidToDelete + " does not exist",
-							"SQL-Deletion error", JOptionPane.ERROR_MESSAGE);
-					cleanEditCandidate();
-				}
+				onDeleteClicked();
 			}
 		});
 		deleteBtn.setForeground(new Color(52, 101, 164));
@@ -164,52 +136,11 @@ public class CandidatesFrame extends JFrame {
 		deleteBtn.setEnabled(false);
 		editCandidatePanel.add(deleteBtn);
 		
-		JButton updateBtn = new JButton("Update");
+		updateBtn = new JButton("Update");
 		updateBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (candidateId.getText().isEmpty()) {
-					return;
-				}
-
-				selectedCandidateUpdateDTO.setFirstname(candidateFirstnameText.getText());
-				selectedCandidateUpdateDTO.setLastname(candidateLastnameText.getText());
-
-				Integer cidToDelete = Integer.parseInt(candidateId.getText());
-
-				try {
-					// Validation
-					CandidateDTOValidator validator = new CandidateDTOValidator();
-					List<String> errors = validator.validate(selectedCandidateUpdateDTO);
-
-					if (!errors.isEmpty()) {
-						StringBuilder errorStringBuilder = new StringBuilder();
-						errors.forEach((s) -> errorStringBuilder.append(s).append('\n'));
-						JOptionPane.showMessageDialog(null, errorStringBuilder.toString(),
-								"Update error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-
-					candidateService.updateCandidate(selectedCandidateUpdateDTO);
-
-					// Update candidates table
-					candidatesWithVotesReadOnlyDTOs = createCandidatesWithVotesReadOnlyDTO();
-					renderCandidatesTable(candidatesWithVotesReadOnlyDTOs);
-
-					cleanEditCandidate();
-
-					JOptionPane.showMessageDialog(null, "Successful candidate update",
-							"Information", JOptionPane.INFORMATION_MESSAGE);
-				} catch (CandidateDAOException e1) {
-					JOptionPane.showMessageDialog(null, "Error in Candidate storage",
-							"SQL-Insertion error", JOptionPane.ERROR_MESSAGE);
-					cleanEditCandidate();
-				} catch (CandidateNotFoundException e2) {
-					JOptionPane.showMessageDialog(null,
-							"Candidate with id: " + cidToDelete + " does not exist",
-							"SQL-Deletion error", JOptionPane.ERROR_MESSAGE);
-					cleanEditCandidate();
-				}
+				onUpdateClicked();
 			}
 		});
 		updateBtn.setForeground(new Color(52, 101, 164));
@@ -250,10 +181,7 @@ public class CandidatesFrame extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (candidatesTable.isEnabled()) {
-					selectedCandidateUpdateDTO = createCandidateUpdateDTOFromTable();
-					renderSelectedCandidate(selectedCandidateUpdateDTO);
-					deleteBtn.setEnabled(true);
-					updateBtn.setEnabled(true);
+					onTableClicked();
 				}
 			}
 		});
@@ -298,37 +226,7 @@ public class CandidatesFrame extends JFrame {
 		insertBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CandidateInsertDTO candidateInsertDTO = createCandidateInsertDTO();
-				List<String> errors;
-
-				// Validation
-				CandidateDTOValidator validator = new CandidateDTOValidator();
-				errors = validator.validate(candidateInsertDTO);
-
-				if (!errors.isEmpty()) {
-					StringBuilder errorStringBuilder = new StringBuilder();
-					errors.forEach((s) -> errorStringBuilder.append(s).append('\n'));
-					JOptionPane.showMessageDialog(null, errorStringBuilder.toString(),
-							"Insertion error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-
-                try {
-                    candidateService.insertCandidate(candidateInsertDTO);
-
-					// Update candidates table
-					candidatesWithVotesReadOnlyDTOs = createCandidatesWithVotesReadOnlyDTO();
-					renderCandidatesTable(candidatesWithVotesReadOnlyDTOs);
-
-					// Clean texts
-					cleanInsertCandidate();
-
-					JOptionPane.showMessageDialog(null, "Successful candidate insertion",
-							"Information", JOptionPane.INFORMATION_MESSAGE);
-                } catch (CandidateDAOException e1) {
-					JOptionPane.showMessageDialog(null, "Error in Candidate storage",
-							"SQL-Insertion error", JOptionPane.ERROR_MESSAGE);
-                }
+				onInsertClicked();
             }
 		});
 		insertBtn.setBounds(12, 89, 81, 25);
@@ -345,26 +243,131 @@ public class CandidatesFrame extends JFrame {
 		contentPane.add(selectACandidateText);
 	}
 
+	// BUTTON FUNCTIONALITY
+	private void onDeleteClicked() {
+		if (candidateId.getText().isEmpty()) {
+			return;
+		}
+
+		Integer cidToDelete = Integer.parseInt(candidateId.getText());
+
+		try {
+			int response = JOptionPane.showConfirmDialog(null,
+					"Are you sure you want to delete the candidate with ID: " + cidToDelete + "? This action cannot be undone.",
+					"Delete Confirmation", JOptionPane.YES_NO_OPTION);
+
+			if (response == JOptionPane.YES_OPTION) {
+				// Remove candidates from users that had voted him/her
+				userService.removeAllVotesOfSpecificCid(cidToDelete);
+
+				// Remove candidate from candidates table
+				candidateService.deleteCandidate(cidToDelete);
+
+				// Clean Edit candidate
+				cleanEditCandidate();
+			}
+		} catch (CandidateDAOException | UserDAOException e1) {
+			JOptionPane.showMessageDialog(null, "Error in storage",
+					"SQL-Deletion error", JOptionPane.ERROR_MESSAGE);
+			cleanEditCandidate();
+		} catch (CandidateNotFoundException e2) {
+			JOptionPane.showMessageDialog(null,
+					"Candidate with id: " + cidToDelete + " does not exist",
+					"SQL-Deletion error", JOptionPane.ERROR_MESSAGE);
+			cleanEditCandidate();
+		}
+	}
+
+	private void onUpdateClicked() {
+		if (candidateId.getText().isEmpty()) {
+			return;
+		}
+
+		selectedCandidateUpdateDTO.setFirstname(candidateFirstnameText.getText());
+		selectedCandidateUpdateDTO.setLastname(candidateLastnameText.getText());
+
+		int cidToDelete = Integer.parseInt(candidateId.getText());
+
+		try {
+			// Validation
+			CandidateDTOValidator validator = new CandidateDTOValidator();
+			List<String> errors = validator.validate(selectedCandidateUpdateDTO);
+
+			if (!errors.isEmpty()) {
+				StringBuilder errorStringBuilder = new StringBuilder();
+				errors.forEach((s) -> errorStringBuilder.append(s).append('\n'));
+				JOptionPane.showMessageDialog(null, errorStringBuilder.toString(),
+						"Update error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
+			candidateService.updateCandidate(selectedCandidateUpdateDTO);
+
+			// Update candidates table
+			candidatesWithVotesReadOnlyDTOs = createCandidatesWithVotesReadOnlyDTO();
+			renderCandidatesTable(candidatesWithVotesReadOnlyDTOs);
+
+			cleanEditCandidate();
+
+			JOptionPane.showMessageDialog(null, "Successful candidate update",
+					"Information", JOptionPane.INFORMATION_MESSAGE);
+		} catch (CandidateDAOException e1) {
+			JOptionPane.showMessageDialog(null, "Error in Candidate storage",
+					"SQL-Insertion error", JOptionPane.ERROR_MESSAGE);
+			cleanEditCandidate();
+		} catch (CandidateNotFoundException e2) {
+			JOptionPane.showMessageDialog(null,
+					"Candidate with id: " + cidToDelete + " does not exist",
+					"SQL-Deletion error", JOptionPane.ERROR_MESSAGE);
+			cleanEditCandidate();
+		}
+	}
+
+	private void onInsertClicked() {
+		CandidateInsertDTO candidateInsertDTO = createCandidateInsertDTO();
+		List<String> errors;
+
+		// Validation
+		CandidateDTOValidator validator = new CandidateDTOValidator();
+		errors = validator.validate(candidateInsertDTO);
+
+		if (!errors.isEmpty()) {
+			StringBuilder errorStringBuilder = new StringBuilder();
+			errors.forEach((s) -> errorStringBuilder.append(s).append('\n'));
+			JOptionPane.showMessageDialog(null, errorStringBuilder.toString(),
+					"Insertion error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		try {
+			candidateService.insertCandidate(candidateInsertDTO);
+
+			// Update candidates table
+			candidatesWithVotesReadOnlyDTOs = createCandidatesWithVotesReadOnlyDTO();
+			renderCandidatesTable(candidatesWithVotesReadOnlyDTOs);
+
+			// Clean texts
+			cleanInsertCandidate();
+
+			JOptionPane.showMessageDialog(null, "Successful candidate insertion",
+					"Information", JOptionPane.INFORMATION_MESSAGE);
+		} catch (CandidateDAOException e1) {
+			JOptionPane.showMessageDialog(null, "Error in Candidate storage",
+					"SQL-Insertion error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	private void onTableClicked() {
+		selectedCandidateUpdateDTO = createCandidateUpdateDTOFromTable();
+		renderSelectedCandidate(selectedCandidateUpdateDTO);
+		deleteBtn.setEnabled(true);
+		updateBtn.setEnabled(true);
+	}
+
 	// RENDERING
 
 	private void renderCandidatesTable(List<CandidatesWithVotesReadOnlyDTO> readOnlyDTOs) {
-		Vector<String> vector;
-
-		cleanTable();
-
-		// Sort based on the lastname
-		readOnlyDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getLastname));
-
-		// Add to model
-		for (CandidatesWithVotesReadOnlyDTO dto : readOnlyDTOs) {
-			vector = new Vector<>(4);
-			vector.add(Integer.toString(dto.getCid()));
-			vector.add(dto.getFirstname());
-			vector.add(dto.getLastname());
-			vector.add(String.valueOf(dto.getTotalVotes()));
-
-			candidatesModel.addRow(vector);
-		}
+		RenderingUtil.renderCandidatesModelTable(readOnlyDTOs, candidatesModel);
 	}
 
 	private void renderSelectedCandidate(CandidateUpdateDTO selectedCandidateUpdateDTO) {
@@ -380,31 +383,7 @@ public class CandidatesFrame extends JFrame {
 	// DTOs
 
 	private List<CandidatesWithVotesReadOnlyDTO> createCandidatesWithVotesReadOnlyDTO() {
-		try {
-			Map<Candidate, Integer> candidatesWithVotes = candidateService.getAllCandidatesWithVotes();
-			return mapToCandidatesWithVotesReadOnlyDTO(candidatesWithVotes);
-		} catch (CandidateDAOException e) {
-			JOptionPane.showMessageDialog(null, "Error in retrieving the results",
-					"Results table error", JOptionPane.ERROR_MESSAGE);
-			return null;
-		}
-	}
-
-	private List<CandidatesWithVotesReadOnlyDTO> mapToCandidatesWithVotesReadOnlyDTO(Map<Candidate, Integer> candidatesWithVotes) {
-		List<CandidatesWithVotesReadOnlyDTO> candidatesWithVotesArray = new ArrayList<>();
-		CandidatesWithVotesReadOnlyDTO dto;
-
-		for (Candidate candidate : candidatesWithVotes.keySet()) {
-			dto = new CandidatesWithVotesReadOnlyDTO(
-					candidate.getCid(),
-					candidate.getFirstname(),
-					candidate.getLastname(),
-					candidatesWithVotes.get(candidate)
-			);
-			candidatesWithVotesArray.add(dto);
-		}
-
-		return candidatesWithVotesArray;
+		return CandidatesWithVotesDTOsUtil.createList();
 	}
 
 	private CandidateUpdateDTO createCandidateUpdateDTOFromTable() {

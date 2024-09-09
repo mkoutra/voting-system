@@ -93,24 +93,6 @@ public class CandidateServiceImpl implements ICandidateService {
     }
 
     @Override
-    public void sortCandidatesWithVotesReadonlyDTOs(List<CandidatesWithVotesReadOnlyDTO> candidatesDTOs, int sortByIndex)  {
-        switch (sortByIndex) {
-            case 0:
-                candidatesDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getTotalVotes).reversed());
-                break;
-            case 1:
-                candidatesDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getFirstname));
-                break;
-            case 2:
-                candidatesDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getLastname));
-                break;
-            case 3:
-                candidatesDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getCid));
-                break;
-        }
-    }
-
-    @Override
     public File fixFileExtension(File file, String defaultExt) throws CandidateIOException {
         File correctExtensionFile = file;
         if (file == null || defaultExt == null) throw new CandidateIOException("Error in file extension.");

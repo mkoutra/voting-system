@@ -159,7 +159,7 @@ public class VotingResultsFrame extends JFrame {
 	}
 
 	private void sortCandidates(Integer sortByIndex) {
-		candidateService.sortCandidatesWithVotesReadonlyDTOs(candidatesWithVotesReadOnlyDTOs, sortByIndex);
+		CandidatesWithVotesDTOsUtil.sortCandidatesWithVotesReadonlyDTOs(candidatesWithVotesReadOnlyDTOs, sortByIndex);
 	}
 
 	private void onSaveResultsClicked() {

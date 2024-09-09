@@ -26,4 +26,9 @@
     - Create a method for each button clicked.
     - Create createCandidateReadOnlyDTOList() method to retrieve the DTOs in a list.
     - Modify renderCandidatesTable to use RenderingUtil class
-    
+  
+  - Move sortCandidatesWithVotesReadonlyDTOs from service to CandidatesWithVotesDTOsUtil
+  - In CandidatesFrame:
+    - Use RenderingUtil in renderCandidatesTable().
+    - Use the CandidatesWithVotesDTOsUtil in existed methods
+    - Move button functionality to methods

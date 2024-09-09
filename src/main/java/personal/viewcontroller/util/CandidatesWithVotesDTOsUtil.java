@@ -10,11 +10,12 @@ import personal.service.ICandidateService;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Utility class to help wit CandidatesWithVotesDTOs handling.
+ * Utility class to help with CandidatesWithVotesDTOs handling.
  *
  * @author Michail E. Koutrakis
  */
@@ -24,6 +25,23 @@ public class CandidatesWithVotesDTOsUtil {
     private static final ICandidateService candidateService = new CandidateServiceImpl(candidateDAO);
 
     private CandidatesWithVotesDTOsUtil() {}
+
+    public static void sortCandidatesWithVotesReadonlyDTOs(List<CandidatesWithVotesReadOnlyDTO> candidatesDTOs, int sortByIndex)  {
+        switch (sortByIndex) {
+            case 0:
+                candidatesDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getTotalVotes).reversed());
+                break;
+            case 1:
+                candidatesDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getFirstname));
+                break;
+            case 2:
+                candidatesDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getLastname));
+                break;
+            case 3:
+                candidatesDTOs.sort(Comparator.comparing(CandidatesWithVotesReadOnlyDTO::getCid));
+                break;
+        }
+    }
 
     public static List<CandidatesWithVotesReadOnlyDTO> createList() {
         try {

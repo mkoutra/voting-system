@@ -92,8 +92,6 @@ public interface ICandidateService {
      */
     void saveVotingResults(List<CandidatesWithVotesReadOnlyDTO> candidatesDTOs, File file) throws CandidateIOException;
 
-    void sortCandidatesWithVotesReadonlyDTOs(List<CandidatesWithVotesReadOnlyDTO> candidatesDTOs, int sortByIndex);
-
     /**
      * Ensures the given file has either a '.csv' or '.txt' extension.
      * If the file does not have one of these extensions, the {@code defaultExt}
