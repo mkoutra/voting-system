@@ -32,3 +32,6 @@
     - Use RenderingUtil in renderCandidatesTable().
     - Use the CandidatesWithVotesDTOsUtil in existed methods
     - Move button functionality to methods
+
+  - In Candidates and User DAO implementation:
+    Replace COUNT() with EXISTS() statements

@@ -71,11 +71,13 @@ public class CandidateDAOImpl implements ICandidateDAO {
 
     @Override
     public boolean cidExists(Integer cid) throws CandidateDAOException {
-        String sql = "SELECT COUNT(1) FROM candidates WHERE cid = ?;";
+//        String sql = "SELECT COUNT(1) FROM candidates WHERE cid = ?;";
+        String sql  = "SELECT 1 WHERE EXISTS(SELECT 1 FROM candidates WHERE cid = ?);";
+        int candidateExists = 0;
+
         try(Connection connection = DBUtil.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql)) {
 
-            int candidateExists = 0;
             ps.setInt(1, cid);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {

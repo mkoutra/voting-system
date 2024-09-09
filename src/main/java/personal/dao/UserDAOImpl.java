@@ -160,7 +160,7 @@ public class UserDAOImpl implements IUserDAO {
 
     @Override
     public boolean usernameExists(String username) throws UserDAOException {
-        String sql = "SELECT COUNT(1) FROM users WHERE username = ?";
+        String sql = "SELECT 1 WHERE EXISTS(SELECT 1 FROM users WHERE username = ?);";
         int userExists = 0;
 
         try (Connection connection = DBUtil.getConnection();
@@ -172,7 +172,7 @@ public class UserDAOImpl implements IUserDAO {
                 userExists = rs.getInt(1);
             }
 
-            return userExists != 0;
+            return userExists == 1;
         } catch (SQLException e) {
             e.printStackTrace();
             throw new UserDAOException("SQL error in usernameExists for username = " + username);
@@ -181,7 +181,8 @@ public class UserDAOImpl implements IUserDAO {
 
     @Override
     public boolean emailExists(String email) throws UserDAOException {
-        String sql = "SELECT COUNT(1) FROM users WHERE email = ?";
+//        String sql = "SELECT COUNT(1) FROM users WHERE email = ?";
+        String sql = "SELECT 1 WHERE EXISTS(SELECT 1 FROM users WHERE email = ?);";
         int userExists = 0;
 
         try (Connection connection = DBUtil.getConnection();
