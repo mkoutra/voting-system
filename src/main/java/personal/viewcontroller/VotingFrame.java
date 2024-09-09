@@ -25,7 +25,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import javax.swing.border.BevelBorder;
 
 /**
@@ -72,29 +71,12 @@ public class VotingFrame extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent e) {
-				buildUserInformation(voterReadOnlyDTO);
-
-				// Check if user has already voted.
-				if (checkIfAlreadyVoted(voterReadOnlyDTO)) {
-					viewVoteBtn.setEnabled(true);
-					selectACandidateText.setText("Your vote has been already successfully submitted.");
-				} else {
-					buildCandidatesTable();
-				}
+				onWindowOpened();
 			}
 
 			@Override
 			public void windowActivated(WindowEvent e) {
-				buildUserInformation(getVoterReadOnlyDTO());
-
-				if (checkIfAlreadyVoted(voterReadOnlyDTO)) {
-					candidatesTable.setEnabled(false);
-					viewVoteBtn.setEnabled(true);
-					selectACandidateText.setText("Your vote has been already successfully submitted.");
-				} else {
-					buildCandidatesTable();
-					candidatesTable.setEnabled(true);
-				}
+				onWindowActivated();
 			}
 
 			@Override
@@ -167,9 +149,7 @@ public class VotingFrame extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (candidatesTable.isEnabled()) {
-					selectedCandidateReadOnlyDTO = createSelectedCandidateReadOnlyDTO();
-					buildSelectedCandidate(selectedCandidateReadOnlyDTO);
-					voteBtn.setEnabled(true);
+					onTableClicked();
 				}
 			}
 		});
@@ -215,10 +195,7 @@ public class VotingFrame extends JFrame {
 		voteBtn = new JButton("Vote");
 		voteBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (selectedCandidateReadOnlyDTO == null || voterReadOnlyDTO == null) {
-					return;
-				}
-				submitAVote(voterReadOnlyDTO, selectedCandidateReadOnlyDTO);
+				onVoteClicked();
 			}
 		});
 		voteBtn.setForeground(new Color(52, 101, 164));
@@ -235,11 +212,7 @@ public class VotingFrame extends JFrame {
 		viewVoteBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				CandidateReadOnlyDTO candidateReadOnlyDTO = getVotedCandidate(voterReadOnlyDTO);
-				if (candidateReadOnlyDTO == null) return;
-				String message = "You have voted for: " + candidateReadOnlyDTO.getFirstname() + " "
-						+ candidateReadOnlyDTO.getLastname() + " (id: " + candidateReadOnlyDTO.getCid() + ")";
-				JOptionPane.showMessageDialog(null, message, "Voting Information", JOptionPane.INFORMATION_MESSAGE);
+				onViewVoteClicked();
 			}
 		});
 		viewVoteBtn.setBounds(0, 0, 141, 25);
@@ -251,14 +224,7 @@ public class VotingFrame extends JFrame {
 		logoutBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to log out?",
-						"Logout Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-				if (response == JOptionPane.YES_OPTION) {
-					resetWindow();
-					App.getMainMenuFrame().setEnabled(true);
-					App.getMainMenuFrame().setVisible(true);
-					dispose();
-				}
+				onLogoutClicked();
 			}
 		});
 		logoutBtn.setBounds(0, 109, 141, 25);
@@ -268,8 +234,7 @@ public class VotingFrame extends JFrame {
 		resultsBtn = new JButton("Results");
 		resultsBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				App.getVotingResultsFrame().setVisible(true);
-				App.getVotingWindow().setEnabled(false);
+				onResultsClicked();
 			}
 		});
 		resultsBtn.setBounds(0, 36, 141, 25);
@@ -280,16 +245,7 @@ public class VotingFrame extends JFrame {
 		changePasswordBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					User user = mapReadOnlyDTOToUser(voterReadOnlyDTO);
-					App.getChangePasswordFrame().setUser(user);
-					App.getChangePasswordFrame().setParentFrame(App.getVotingWindow());
-					App.getChangePasswordFrame().setVisible(true);
-					App.getVotingWindow().setEnabled(false);
-				} catch (UserNotFoundException | UserDAOException e1) {
-					JOptionPane.showMessageDialog(null, "Unable to open change password window",
-							"Error", JOptionPane.ERROR_MESSAGE);
-				}
+				onChangePasswordClicked();
 			}
 		});
 		changePasswordBtn.setFont(new Font("Dialog", Font.BOLD, 10));
@@ -298,59 +254,125 @@ public class VotingFrame extends JFrame {
 		optionsPanel.add(changePasswordBtn);
 	}
 
-	private void buildCandidatesTable() {
+	private void onResultsClicked() {
+		App.getVotingResultsFrame().setVisible(true);
+		App.getVotingWindow().setEnabled(false);
+	}
+
+	private void onChangePasswordClicked() {
 		try {
-			List<Candidate> candidates = candidateService.getAllCandidates();
-			List<CandidateReadOnlyDTO> readOnlyDTOCandidates = new ArrayList<>();
-			Vector<String> vector;
+			User user = mapReadOnlyDTOToUser(voterReadOnlyDTO);
+			App.getChangePasswordFrame().setUser(user);
+			App.getChangePasswordFrame().setParentFrame(App.getVotingWindow());
+			App.getChangePasswordFrame().setVisible(true);
+			App.getVotingWindow().setEnabled(false);
+		} catch (UserNotFoundException | UserDAOException e1) {
+			JOptionPane.showMessageDialog(null, "Unable to open change password window",
+					"Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
 
-			// Insert readOnlyDTO to arrayList.
-			for (Candidate candidate : candidates) {
-				readOnlyDTOCandidates.add(mapCandidateToCandidateReadOnlyDTO(candidate));
-			}
+	private void onLogoutClicked() {
+		int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to log out?",
+				"Logout Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.YES_OPTION) {
+			resetWindow();
+			App.getMainMenuFrame().setEnabled(true);
+			App.getMainMenuFrame().setVisible(true);
+			dispose();
+		}
+	}
 
-			cleanTable();
+	private void onViewVoteClicked() {
+		// retrieve the candidate that the voter has voted for.
+		CandidateReadOnlyDTO votedCandidate = getVotedCandidate(voterReadOnlyDTO);
 
-			// Add to model
-			for (CandidateReadOnlyDTO dto : readOnlyDTOCandidates) {
-				vector = new Vector<>(3);
-				vector.add(Integer.toString(dto.getCid()));
-				vector.add(dto.getFirstname());
-				vector.add(dto.getLastname());
+		if (votedCandidate == null) return;
 
-				model.addRow(vector);
-			}
+		String message = "You have voted for: " + votedCandidate.getFirstname() + " "
+				+ votedCandidate.getLastname() + " (id: " + votedCandidate.getCid() + ")";
+		JOptionPane.showMessageDialog(null, message, "Voting Information", JOptionPane.INFORMATION_MESSAGE);
+	}
 
+	private void onVoteClicked() {
+		if (selectedCandidateReadOnlyDTO == null || voterReadOnlyDTO == null) {
+			return;
+		}
+		submitAVote(voterReadOnlyDTO, selectedCandidateReadOnlyDTO);
+	}
+
+	private void onTableClicked() {
+		selectedCandidateReadOnlyDTO = readCandidateReadOnlyDTOFromTable();
+		renderSelectedCandidate(selectedCandidateReadOnlyDTO);
+		voteBtn.setEnabled(true);
+	}
+
+	private void onWindowOpened() {
+		renderUserInformation(voterReadOnlyDTO);
+
+		// Check if user has already voted.
+		if (checkIfAlreadyVoted(voterReadOnlyDTO)) {
+			viewVoteBtn.setEnabled(true);
+			selectACandidateText.setText("Your vote has been already successfully submitted.");
+		} else {
+			renderCandidatesTable();
+		}
+	}
+
+	private void onWindowActivated() {
+		renderUserInformation(getVoterReadOnlyDTO());
+
+		if (checkIfAlreadyVoted(voterReadOnlyDTO)) {
+			candidatesTable.setEnabled(false);
+			viewVoteBtn.setEnabled(true);
+			selectACandidateText.setText("Your vote has been already successfully submitted.");
+		} else {
+			renderCandidatesTable();
+			candidatesTable.setEnabled(true);
+		}
+	}
+
+	private void renderCandidatesTable() {
+		try {
+			List<CandidateReadOnlyDTO> candidateReadOnlyDTOList = createCandidateReadOnlyDTOList();
+			RenderingUtil.renderCandidatesModelTable(candidateReadOnlyDTOList, model);
 		} catch (CandidateDAOException e1) {
 			JOptionPane.showMessageDialog(null, "Unable to create candidate table.",
 					"Table error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
+	private List<CandidateReadOnlyDTO> createCandidateReadOnlyDTOList() throws CandidateDAOException {
+		List<Candidate> candidates = candidateService.getAllCandidates();
+		List<CandidateReadOnlyDTO> candidateReadOnlyDTOList = new ArrayList<>();
+
+		for (Candidate candidate : candidates) {
+			candidateReadOnlyDTOList.add(mapCandidateToCandidateReadOnlyDTO(candidate));
+		}
+		return candidateReadOnlyDTOList;
+	}
+
 	private CandidateReadOnlyDTO mapCandidateToCandidateReadOnlyDTO(Candidate candidate) {
-		CandidateReadOnlyDTO candidateReadOnlyDTO = new CandidateReadOnlyDTO();
-		candidateReadOnlyDTO.setCid(candidate.getCid());
-		candidateReadOnlyDTO.setFirstname(candidate.getFirstname());
-		candidateReadOnlyDTO.setLastname(candidate.getLastname());
-
-		return candidateReadOnlyDTO;
+		return new CandidateReadOnlyDTO(candidate.getCid(), candidate.getFirstname(), candidate.getLastname());
 	}
 
-	private CandidateReadOnlyDTO createSelectedCandidateReadOnlyDTO() {
-		CandidateReadOnlyDTO candidateReadOnlyDTO = new CandidateReadOnlyDTO();
-		candidateReadOnlyDTO.setCid(Integer.parseInt((String) model.getValueAt(candidatesTable.getSelectedRow(), 0)));
-		candidateReadOnlyDTO.setFirstname((String) model.getValueAt(candidatesTable.getSelectedRow(), 1));
-		candidateReadOnlyDTO.setLastname((String) model.getValueAt(candidatesTable.getSelectedRow(), 2));
-		return candidateReadOnlyDTO;
+	private CandidateReadOnlyDTO readCandidateReadOnlyDTOFromTable() {
+		// Get values directly from table
+		Integer inputCid = Integer.parseInt((String) model.getValueAt(candidatesTable.getSelectedRow(), 0));
+		String inputFirstname = (String) model.getValueAt(candidatesTable.getSelectedRow(), 1);
+		String inputLastname = (String) model.getValueAt(candidatesTable.getSelectedRow(), 2);
+
+		return new CandidateReadOnlyDTO(inputCid, inputFirstname, inputLastname);
 	}
 
-	private void buildSelectedCandidate(CandidateReadOnlyDTO selectedCandidateReadOnlyDTO) {
+	private void renderSelectedCandidate(CandidateReadOnlyDTO selectedCandidateReadOnlyDTO) {
+		if (selectedCandidateReadOnlyDTO == null) return;
 		idText.setText(Integer.toString(selectedCandidateReadOnlyDTO.getCid()));
 		firstnameText.setText(selectedCandidateReadOnlyDTO.getFirstname());
 		lastnameText.setText(selectedCandidateReadOnlyDTO.getLastname());
 	}
 
-	private void buildUserInformation(UserReadOnlyDTO userReadOnlyDTO) {
+	private void renderUserInformation(UserReadOnlyDTO userReadOnlyDTO) {
 		if (userReadOnlyDTO == null) return;
 		usernameLabel.setText(userReadOnlyDTO.getUsername());
 		userFirstnameLabel.setText(userReadOnlyDTO.getFirstname());
@@ -379,7 +401,7 @@ public class VotingFrame extends JFrame {
 			JOptionPane.showMessageDialog(null, "Voter does not exist.",
 					"Error in Voting", JOptionPane.ERROR_MESSAGE);
 		} catch (UserDAOException | CandidateDAOException e3) {
-			JOptionPane.showMessageDialog(null, "Error in Database",
+			JOptionPane.showMessageDialog(null, "Database error",
 					"Error in Voting", JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -398,7 +420,7 @@ public class VotingFrame extends JFrame {
 		try {
 			User user = mapReadOnlyDTOToUser(userReadOnlyDTO);
 			Candidate candidate = candidateService.getCandidateById(user.getVotedCid());
-			return mapCandidateToReadOnlyDTO(candidate);
+			return mapCandidateToCandidateReadOnlyDTO(candidate);
 		} catch (UserNotFoundException | UserDAOException | CandidateNotFoundException | CandidateDAOException e) {
 			JOptionPane.showMessageDialog(null, "Error retrieving vote",
 					"Vote error", JOptionPane.ERROR_MESSAGE);
@@ -411,9 +433,7 @@ public class VotingFrame extends JFrame {
 		return userService.getUserByUsername(userReadOnlyDTO.getUsername());
 	}
 
-	private CandidateReadOnlyDTO mapCandidateToReadOnlyDTO(Candidate candidate) {
-		return new CandidateReadOnlyDTO(candidate.getCid(), candidate.getFirstname(), candidate.getLastname());
-	}
+	// CLEANING
 
 	private void cleanTable() {
 		for (int row = model.getRowCount() - 1; row >= 0; row--) {

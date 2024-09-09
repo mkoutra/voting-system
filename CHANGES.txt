@@ -13,5 +13,17 @@
 - Sep 9, 2024
   - CandidatesWithVotesDTOUtil class created to handle candidatesWithVotesDTOs
   - Move fixFileExtension to candidateService.
-  - In VotingResultsFarme:
+  - In VotingResultsFrame:
     - Create onSaveResultsClicked(), onCloseClicked() and onComboBoxActivation()
+    
+  - In VotingFrame:
+    - Simplify createSelectedCandidateReadOnlyDTO(), mapCandidateToCandidateReadOnlyDTO()
+    - Rename buildSelectedCandidate() -> renderSelectedCandidate(),
+    	     buildUserInformation() -> renderdUserInformation(),
+    	     createSelectedCandidateReadOnlyDTO() -> readCandidateReadOnlyDTOFromTable(),
+             buildCandidatesTable() -> renderCandidatesTable()
+    - Remove mapCandidateToReadOnlyDTO()
+    - Create a method for each button clicked.
+    - Create createCandidateReadOnlyDTOList() method to retrieve the DTOs in a list.
+    - Modify renderCandidatesTable to use RenderingUtil class
+    
