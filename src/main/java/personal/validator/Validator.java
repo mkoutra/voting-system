@@ -3,28 +3,37 @@ package personal.validator;
 import personal.dao.IUserDAO;
 import personal.dao.UserDAOImpl;
 import personal.dao.exceptions.UserDAOException;
+import personal.dto.ChangePasswordDTO;
 import personal.dto.UserInsertDTO;
+import personal.dto.UserLoginDTO;
+import personal.model.IHasFullName;
 import personal.service.IUserService;
 import personal.service.UserServiceImpl;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * A utility class that validates the DTOs that need to be validated.
+ * No authentication is performed by the following methods.
+ *
  * @author Michail E. Koutrakis
  */
-public class NewUserValidator {
-    private final IUserDAO userDAO = new UserDAOImpl();
-    private final IUserService userService = new UserServiceImpl(userDAO);
+public class Validator {
+    private static final IUserDAO userDAO = new UserDAOImpl();
+    private static final IUserService userService = new UserServiceImpl(userDAO);
 
-    public NewUserValidator() {}
+    private Validator() {}
 
-    public Map<String, String> validate(UserInsertDTO dto) {
+    // New user insertion fields validation
+    public static Map<String, String> validate(UserInsertDTO dto) {
         Map<String, String> errors = new HashMap<>();
+
+        if (dto == null) {
+            errors.put("nullError", "Null error");
+            return errors;
+        }
 
         validateUsername(dto.getUsername(), errors);
         validateEmail(dto.getEmail(), errors);
@@ -37,7 +46,57 @@ public class NewUserValidator {
         return errors;
     }
 
-    private void validateUsername(String username, Map<String, String> errors) {
+    // Change password DTO
+    public static Map<String, String> validate(ChangePasswordDTO dto) {
+        Map<String, String> errors = new HashMap<>();
+
+        if (dto == null) {
+            errors.put("nullError", "Null error");
+            return errors;
+        }
+
+        validatePassword(dto.getNewPassword(), errors);
+        validateReEnteredPassword(dto.getReEnteredPassword(), dto.getNewPassword(), errors);
+
+        return errors;
+    }
+
+    // Validates firstname and lastname
+    public static Map<String, String> validate(IHasFullName dto) {
+        Map<String ,String> errors = new HashMap<>();
+
+        if (dto == null) {
+            errors.put("nullError", "Null error");
+            return errors;
+        }
+
+        validateFirstname(dto.getFirstname(), errors);
+        validateLastname(dto.getLastname(), errors);
+
+        return errors;
+    }
+
+    // Validates input at login
+    public static Map<String, String> validate(UserLoginDTO dto) {
+        Map<String, String> errors = new HashMap<>();
+
+        if (dto == null) {
+            errors.put("nullError", "Null error");
+            return errors;
+        }
+
+        if (dto.getUsername() == null || dto.getUsername().isEmpty()) {
+            errors.put("username", "Invalid username.");
+        }
+
+        if (dto.getPassword() == null || dto.getPassword().isEmpty()) {
+            errors.put("password", "Invalid password.");
+        }
+
+        return errors;
+    }
+
+    private static void validateUsername(String username, Map<String, String> errors) {
         if (username == null) {
             errors.put("username", "Username null error.");
             return;
@@ -56,7 +115,7 @@ public class NewUserValidator {
         }
     }
 
-    private void validateFirstname(String firstname, Map<String, String> errors) {
+    private static void validateFirstname(String firstname, Map<String, String> errors) {
         if (firstname == null) {
             errors.put("firstname", "First name null error.");
             return;
@@ -67,7 +126,7 @@ public class NewUserValidator {
         }
     }
 
-    private void validateLastname(String lastname, Map<String, String> errors) {
+    private static void validateLastname(String lastname, Map<String, String> errors) {
         if (lastname == null) {
             errors.put("lastname", "Last name null error.");
             return;
@@ -78,7 +137,7 @@ public class NewUserValidator {
         }
     }
 
-    private void validateEmail(String email, Map<String, String> errors) {
+    private static void validateEmail(String email, Map<String, String> errors) {
         if (email == null) {
             errors.put("email", "Email null error.");
             return;
@@ -98,7 +157,7 @@ public class NewUserValidator {
         }
     }
 
-    private void validatePassword(String password, Map<String, String> errors) {
+    private static void validatePassword(String password, Map<String, String> errors) {
         if (password == null) {
             errors.put("password", "Password null error.");
             return;
@@ -113,7 +172,7 @@ public class NewUserValidator {
         }
     }
 
-    private void validateReEnteredPassword(String reEnteredPassword, String password, Map<String, String> errors) {
+    private static void validateReEnteredPassword(String reEnteredPassword, String password, Map<String, String> errors) {
         if (reEnteredPassword == null || password == null) {
             errors.put("reEnteredPassword", "Re-Entered password null error.");
             return;
@@ -124,7 +183,7 @@ public class NewUserValidator {
         }
     }
 
-    private void validateDateOfBirth(Date dob, Map<String, String> errors) {
+    private static void validateDateOfBirth(Date dob, Map<String, String> errors) {
         if (dob == null) {
             errors.put("dob", "Invalid date.");
             return;

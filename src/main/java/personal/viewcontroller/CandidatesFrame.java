@@ -14,7 +14,7 @@ import personal.service.ICandidateService;
 import personal.service.IUserService;
 import personal.service.UserServiceImpl;
 import personal.service.exceptions.CandidateNotFoundException;
-import personal.validator.CandidateDTOValidator;
+import personal.validator.Validator;
 import personal.viewcontroller.util.CandidatesWithVotesDTOsUtil;
 
 import javax.swing.*;
@@ -290,12 +290,11 @@ public class CandidatesFrame extends JFrame {
 
 		try {
 			// Validation
-			CandidateDTOValidator validator = new CandidateDTOValidator();
-			List<String> errors = validator.validate(selectedCandidateUpdateDTO);
+			Map<String, String> errors = Validator.validate(selectedCandidateUpdateDTO);
 
 			if (!errors.isEmpty()) {
 				StringBuilder errorStringBuilder = new StringBuilder();
-				errors.forEach((s) -> errorStringBuilder.append(s).append('\n'));
+				errors.values().forEach((v) -> errorStringBuilder.append(v).append('\n'));
 				JOptionPane.showMessageDialog(null, errorStringBuilder.toString(),
 						"Update error", JOptionPane.ERROR_MESSAGE);
 				return;
@@ -325,15 +324,13 @@ public class CandidatesFrame extends JFrame {
 
 	private void onInsertClicked() {
 		CandidateInsertDTO candidateInsertDTO = createCandidateInsertDTO();
-		List<String> errors;
 
 		// Validation
-		CandidateDTOValidator validator = new CandidateDTOValidator();
-		errors = validator.validate(candidateInsertDTO);
+		Map<String, String> errors = Validator.validate(candidateInsertDTO);
 
 		if (!errors.isEmpty()) {
 			StringBuilder errorStringBuilder = new StringBuilder();
-			errors.forEach((s) -> errorStringBuilder.append(s).append('\n'));
+			errors.values().forEach((v) -> errorStringBuilder.append(v).append('\n'));
 			JOptionPane.showMessageDialog(null, errorStringBuilder.toString(),
 					"Insertion error", JOptionPane.ERROR_MESSAGE);
 			return;

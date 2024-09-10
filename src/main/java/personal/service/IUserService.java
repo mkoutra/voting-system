@@ -72,9 +72,10 @@ public interface IUserService {
     /**
      * Authenticates a user by verifying their username and plain-text password.
      *
-     * @param username      The username of the user.
-     * @param plainPassword The plain-text password provided for authentication.
-     * @return {@code true} if authentication is successful, {@code false} otherwise.
+     * @param username              The username of the user.
+     * @param plainPassword         The plain-text password provided for authentication.
+     * @return                      {@code true} if authentication is successful,
+     *                              {@code false} otherwise.
      * @throws UserNotFoundException If the user is not found in the system.
      * @throws UserDAOException      If an error occurs during the database operation.
      */
@@ -135,7 +136,7 @@ public interface IUserService {
 
     /**
      * Creates an admin user.
-     * @throws UserDAOException
+     * @throws UserDAOException If a database related error occurs.
      */
     void createAdminAccount() throws UserDAOException;
 }

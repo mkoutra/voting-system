@@ -10,7 +10,7 @@ import personal.model.User;
 import personal.service.IUserService;
 import personal.service.UserServiceImpl;
 import personal.service.exceptions.UserNotFoundException;
-import personal.validator.LoginValidator;
+import personal.validator.Validator;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -142,27 +142,7 @@ public class MainMenuFrame extends JFrame {
 		submitBtn = new JButton("Sign in");
 		submitBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				UserLoginDTO userLoginDTO = createUserLoginDTO();
-				LoginValidator loginValidator = new LoginValidator();
-
-				// Validate
-				if (!loginValidator.validate(userLoginDTO)) {
-					failedLoginText.setVisible(true);
-					return;
-				}
-
-				cleanTexts();
-
-				// Activate Voting or Admin Window
-				if (userLoginDTO.getUsername().equals("admin")) {
-					activateAdminOptionsWindow();
-				} else {
-					activateVotingWindow(userLoginDTO);
-				}
-
-				// Disable and hide Main Menu Frame
-				App.getMainMenuFrame().setEnabled(false);
-				App.getMainMenuFrame().setVisible(false);
+				onSignInClicked();
 			}
 		});
 		submitBtn.setBounds(81, 140, 161, 25);
@@ -192,10 +172,48 @@ public class MainMenuFrame extends JFrame {
 		panel_2.add(lblLogInTo);
 	}
 
+	private void onSignInClicked() {
+		try {
+			UserLoginDTO userLoginDTO = createUserLoginDTO();
+			boolean isValidInput = false;
+			boolean isAuthenticated = false;
+
+			// Validate
+			isValidInput = Validator.validate(userLoginDTO).isEmpty();
+
+			if (!isValidInput) {
+				failedLoginText.setVisible(true);
+				return;
+			}
+
+			// Authentication
+			isAuthenticated = userService.authenticateUser(userLoginDTO.getUsername(), userLoginDTO.getPassword());
+			if (!isAuthenticated) {
+				failedLoginText.setVisible(true);
+				return;
+			}
+
+			// Activate Voting or Admin Window
+			if (userLoginDTO.getUsername().equals("admin")) {
+				activateAdminOptionsWindow();
+			} else {
+				activateVotingWindow(userLoginDTO);
+			}
+
+			cleanTexts();
+
+			// Disable and hide Main Menu Frame
+			App.getMainMenuFrame().setEnabled(false);
+			App.getMainMenuFrame().setVisible(false);
+		} catch (UserNotFoundException | UserDAOException e1) {
+			failedLoginText.setVisible(true);
+		}
+	}
+
 	private UserLoginDTO createUserLoginDTO() {
 		UserLoginDTO dto = new UserLoginDTO();
-		dto.setUsername(usernameText.getText());
-		dto.setPassword(new String(passwordField.getPassword()));
+		dto.setUsername(usernameText.getText().trim());
+		dto.setPassword(new String(passwordField.getPassword()).trim());
 		return dto;
 	}
 

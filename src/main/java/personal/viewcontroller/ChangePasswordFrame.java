@@ -9,7 +9,7 @@ import personal.service.IUserService;
 import personal.service.UserServiceImpl;
 import personal.service.exceptions.UserNotFoundException;
 import personal.service.exceptions.WrongPasswordException;
-import personal.validator.ChangePasswordValidator;
+import personal.validator.Validator;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -18,7 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Michail E. Koutrakis
@@ -122,35 +122,7 @@ public class ChangePasswordFrame extends JFrame {
 		submitBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ChangePasswordDTO changePasswordDTO = createChangePasswordDTO();
-				ChangePasswordValidator validator = new ChangePasswordValidator();
-				List<String> errors = validator.validate(changePasswordDTO);
-				StringBuilder sb = new StringBuilder();
-
-				if (user == null) return;
-
-				if (!errors.isEmpty()) {
-					errors.forEach((error) -> sb.append(error).append('\n'));
-					JOptionPane.showMessageDialog(null, sb.toString(), "Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-
-				try {
-					int response = JOptionPane.showConfirmDialog(null, "Are you sure?",
-							"Confirmation", JOptionPane.YES_NO_OPTION);
-					if (response == JOptionPane.YES_OPTION) {
-						userService.changePassword(user, changePasswordDTO);
-						cleanAll();
-						JOptionPane.showMessageDialog(null, "Password changed successfully",
-								"Password Changed", JOptionPane.INFORMATION_MESSAGE);
-						parentFrame.setEnabled(true);
-						dispose();
-					}
-				} catch (WrongPasswordException e1) {
-					JOptionPane.showMessageDialog(null, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-				} catch (UserNotFoundException | UserDAOException e2) {
-					JOptionPane.showMessageDialog(null, "Error retrieving the user", "Error", JOptionPane.ERROR_MESSAGE);
-				}
+				onSubmitClicked();
 			}
 		});
 		submitBtn.setForeground(new Color(52, 101, 164));
@@ -167,6 +139,41 @@ public class ChangePasswordFrame extends JFrame {
 		changePasswordLabel.setForeground(new Color(238, 238, 236));
 		changePasswordLabel.setBounds(160, 12, 133, 15);
 		titlePanel.add(changePasswordLabel);
+	}
+
+	private void onSubmitClicked() {
+		if (user == null) return;
+		ChangePasswordDTO changePasswordDTO = createChangePasswordDTO();
+
+		// Validation
+		Map<String, String> errors = Validator.validate(changePasswordDTO);
+
+		if (!errors.isEmpty()) {
+			StringBuilder sb = new StringBuilder();
+			errors.values().forEach((value) -> sb.append(value).append('\n'));
+			JOptionPane.showMessageDialog(null, sb.toString(), "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		try {
+			int response = JOptionPane.showConfirmDialog(null, "Are you sure?",
+					"Confirmation", JOptionPane.YES_NO_OPTION);
+
+			if (response == JOptionPane.YES_OPTION) {
+				userService.changePassword(user, changePasswordDTO);
+
+				JOptionPane.showMessageDialog(null, "Password changed successfully",
+						"Password Changed", JOptionPane.INFORMATION_MESSAGE);
+
+				cleanAll();
+				parentFrame.setEnabled(true);
+				dispose();
+			}
+		} catch (WrongPasswordException e1) {
+			JOptionPane.showMessageDialog(null, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		} catch (UserNotFoundException | UserDAOException e2) {
+			JOptionPane.showMessageDialog(null, "Error retrieving the user", "Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	private ChangePasswordDTO createChangePasswordDTO() {

@@ -26,9 +26,7 @@ class NewUserValidatorTest {
         dto.setPassword("123aA*fdasff");
         dto.setReEnteredPassword("123aA*");
 
-        NewUserValidator validator = new NewUserValidator();
-
-        errors = validator.validate(dto);
+        errors = Validator.validate(dto);
 
 //        for (String key : errors.keySet()) {
 //            System.out.println(key +": "+ errors.get(key));

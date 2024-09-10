@@ -75,7 +75,6 @@ public class AdminOptionsFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				activateCandidateWindow();
-
 				App.getAdminOptionsFrame().setEnabled(false);
 			}
 		});

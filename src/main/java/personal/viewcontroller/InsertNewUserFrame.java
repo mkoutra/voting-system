@@ -11,7 +11,7 @@ import personal.dao.exceptions.UserDAOException;
 import personal.dto.UserInsertDTO;
 import personal.service.IUserService;
 import personal.service.UserServiceImpl;
-import personal.validator.NewUserValidator;
+import personal.validator.Validator;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -300,7 +300,6 @@ public class InsertNewUserFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				UserInsertDTO insertDTO = new UserInsertDTO();
 				Map<String, String> errors;
-				NewUserValidator newUservalidator = new NewUserValidator();
 
 				// Binding
 				insertDTO.setUsername(usernameText.getText().trim());
@@ -312,7 +311,7 @@ public class InsertNewUserFrame extends JFrame {
 				insertDTO.setReEnteredPassword(new String(reEnterPasswordField.getPassword()).trim());
 
 				// Validation
-				errors = newUservalidator.validate(insertDTO);
+				errors = Validator.validate(insertDTO);
 
 				if (!errors.isEmpty()) {
 					usernameErrorLabel.setText(errors.getOrDefault("username", ""));

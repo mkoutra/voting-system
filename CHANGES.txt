@@ -35,3 +35,10 @@
 
   - In Candidates and User DAO implementation:
     Replace COUNT() with EXISTS() statements
+
+- Sep 10, 2024
+  - Rename NewUserValidator -> Validator.
+  - Make Validator a utility class.
+  - Overload validate() method in Validator to replace the classes ChangePasswordValidator and CandidateDTOValidator
+  - Remove ChangePasswordValidator, LoginValidator and CandidateDTOValidator. Their functionality replaced
+    by overloading the validator() method in Validator utility class.
