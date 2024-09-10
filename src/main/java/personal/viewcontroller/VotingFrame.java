@@ -17,6 +17,7 @@ import personal.service.IUserService;
 import personal.service.UserServiceImpl;
 import personal.service.exceptions.CandidateNotFoundException;
 import personal.service.exceptions.UserNotFoundException;
+import personal.viewcontroller.util.RenderingUtil;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

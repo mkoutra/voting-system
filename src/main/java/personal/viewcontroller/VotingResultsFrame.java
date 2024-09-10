@@ -8,6 +8,7 @@ import personal.service.CandidateServiceImpl;
 import personal.service.ICandidateService;
 import personal.service.exceptions.CandidateIOException;
 import personal.viewcontroller.util.CandidatesWithVotesDTOsUtil;
+import personal.viewcontroller.util.RenderingUtil;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

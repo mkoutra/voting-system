@@ -1,10 +1,8 @@
-package personal.viewcontroller;
+package personal.viewcontroller.util;
 
-import personal.dto.CandidateInsertDTO;
 import personal.dto.CandidateReadOnlyDTO;
 import personal.dto.CandidatesWithVotesReadOnlyDTO;
 
-import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 import java.util.Vector;

@@ -16,6 +16,7 @@ import personal.service.UserServiceImpl;
 import personal.service.exceptions.CandidateNotFoundException;
 import personal.validator.Validator;
 import personal.viewcontroller.util.CandidatesWithVotesDTOsUtil;
+import personal.viewcontroller.util.RenderingUtil;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
