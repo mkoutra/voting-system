@@ -74,8 +74,7 @@ public class AdminOptionsFrame extends JFrame {
 		candidatesBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				activateCandidateWindow();
-				App.getAdminOptionsFrame().setEnabled(false);
+				onCandidatesClicked();
 			}
 		});
 		candidatesBtn.setBounds(34, 13, 162, 25);
@@ -86,18 +85,7 @@ public class AdminOptionsFrame extends JFrame {
 		changePasswordBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					User user = userService.getUserByUsername("admin");
-					App.getChangePasswordFrame().setUser(user);
-					App.getChangePasswordFrame().setParentFrame(App.getAdminOptionsFrame());
-					App.getChangePasswordFrame().setVisible(true);
-
-					// Deactivate current window
-					App.getAdminOptionsFrame().setEnabled(false);
-				} catch (UserNotFoundException | UserDAOException e1) {
-					JOptionPane.showMessageDialog(null, "Unable to open change password window",
-							"Error", JOptionPane.ERROR_MESSAGE);
-				}
+				onChangePasswordClicked();
 			}
 		});
 		changePasswordBtn.setForeground(new Color(52, 101, 164));
@@ -108,13 +96,7 @@ public class AdminOptionsFrame extends JFrame {
 		logoutBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to log out?",
-						"Logout Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-				if (response == JOptionPane.YES_OPTION) {
-					App.getMainMenuFrame().setEnabled(true);
-					App.getMainMenuFrame().setVisible(true);
-					dispose();
-				}
+				onLogoutClicked();
 			}
 		});
 		logoutBtn.setBounds(34, 89, 162, 25);
@@ -122,7 +104,35 @@ public class AdminOptionsFrame extends JFrame {
 		logoutBtn.setForeground(new Color(52, 101, 164));
 	}
 
-	private void activateCandidateWindow() {
+	private void onCandidatesClicked() {
 		App.getCandidatesFrame().setVisible(true);
+		App.getAdminOptionsFrame().setEnabled(false);
+	}
+
+	private void onChangePasswordClicked() {
+		try {
+			User user = userService.getUserByUsername("admin");
+
+			// Activate ChangePassword frame
+			App.getChangePasswordFrame().setUser(user);
+			App.getChangePasswordFrame().setParentFrame(App.getAdminOptionsFrame());
+			App.getChangePasswordFrame().setVisible(true);
+
+			App.getAdminOptionsFrame().setEnabled(false);	// Disable current window
+		} catch (UserNotFoundException | UserDAOException e1) {
+			e1.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Unable to open change password window",
+					"Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	private void onLogoutClicked() {
+		int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to log out?",
+				"Logout Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.YES_OPTION) {
+			App.getMainMenuFrame().setEnabled(true);
+			App.getMainMenuFrame().setVisible(true);
+			dispose();
+		}
 	}
 }

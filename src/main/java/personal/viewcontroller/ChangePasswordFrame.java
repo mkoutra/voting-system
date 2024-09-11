@@ -63,11 +63,6 @@ public class ChangePasswordFrame extends JFrame {
 			}
 
 			@Override
-			public void windowActivated(WindowEvent e) {
-				cleanAll();
-			}
-
-			@Override
 			public void windowClosing(WindowEvent e) {
 				if (isEnabled()) {
 					cleanAll();
@@ -151,7 +146,8 @@ public class ChangePasswordFrame extends JFrame {
 		if (!errors.isEmpty()) {
 			StringBuilder sb = new StringBuilder();
 			errors.values().forEach((value) -> sb.append(value).append('\n'));
-			JOptionPane.showMessageDialog(null, sb.toString(), "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, sb.toString(),
+					"Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
@@ -170,9 +166,11 @@ public class ChangePasswordFrame extends JFrame {
 				dispose();
 			}
 		} catch (WrongPasswordException e1) {
-			JOptionPane.showMessageDialog(null, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, e1.getMessage(),
+					"Error", JOptionPane.ERROR_MESSAGE);
 		} catch (UserNotFoundException | UserDAOException e2) {
-			JOptionPane.showMessageDialog(null, "Error retrieving the user", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Error retrieving the user",
+					"Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 

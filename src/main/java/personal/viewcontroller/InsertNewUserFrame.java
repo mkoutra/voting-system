@@ -55,15 +55,9 @@ public class InsertNewUserFrame extends JFrame {
 			}
 
 			@Override
-			public void windowActivated(WindowEvent e) {
-				cleanAll();
-			}
-
-			@Override
 			public void windowClosing(WindowEvent e) {
 				if (isEnabled()) {
-					App.getMainMenuFrame().setEnabled(true);
-					dispose();
+					closeWindow();
 				}
 			}
 		});
@@ -298,54 +292,65 @@ public class InsertNewUserFrame extends JFrame {
 		JButton submitBtn = new JButton("Submit");
 		submitBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				UserInsertDTO insertDTO = new UserInsertDTO();
-				Map<String, String> errors;
-
-				// Binding
-				insertDTO.setUsername(usernameText.getText().trim());
-				insertDTO.setEmail(emailText.getText().trim());
-				insertDTO.setFirstname(firstnameText.getText().trim());
-				insertDTO.setLastname(lastnameText.getText().trim());
-				insertDTO.setDateOfBirth(dateOfBirth.getDate());
-				insertDTO.setPassword(new String(passwordField.getPassword()).trim());
-				insertDTO.setReEnteredPassword(new String(reEnterPasswordField.getPassword()).trim());
-
-				// Validation
-				errors = Validator.validate(insertDTO);
-
-				if (!errors.isEmpty()) {
-					usernameErrorLabel.setText(errors.getOrDefault("username", ""));
-					emailErrorLabel.setText(errors.getOrDefault("email", ""));
-					firstnameErrorLabel.setText(errors.getOrDefault("firstname", ""));
-					lastnameErrorLabel.setText(errors.getOrDefault("lastname", ""));
-					dateOfBirthErrorLabel.setText(errors.getOrDefault("dob", ""));
-					passwordErrorLabel.setText(errors.getOrDefault("password", ""));
-					reEnterPasswordErrorLabel.setText(errors.getOrDefault("reEnteredPassword", ""));
-
-					return;
-				}
-
-				// Insert to DB, clean texts and close window
-				try {
-					userService.insertUser(insertDTO);
-
-					JOptionPane.showMessageDialog(null,
-							"Welcome " + insertDTO.getUsername() + "!\nYour account has been created successfully.",
-							"Successful Insertion", JOptionPane.INFORMATION_MESSAGE);
-
-					App.getMainMenuFrame().setEnabled(true);
-					cleanAll();
-					dispose();
-				} catch (UserDAOException e1) {
-					e1.printStackTrace();
-					JOptionPane.showMessageDialog(null, "User insertion error",
-							"Error", JOptionPane.ERROR_MESSAGE);
-				}
+				onSubmitClicked();
 			}
 		});
 		submitBtn.setForeground(new Color(52, 101, 164));
 		submitBtn.setBounds(160, 362, 117, 25);
 		contentPane.add(submitBtn);
+	}
+
+	private void onSubmitClicked() {
+		UserInsertDTO insertDTO = createUserInsertDTO();
+		Map<String, String> errors;
+
+		// Validation
+		errors = Validator.validate(insertDTO);
+		if (!errors.isEmpty()) {
+			renderErrorMessages(errors);
+			return;
+		}
+
+		// Insert to DB, clean texts and close window
+		try {
+			userService.insertUser(insertDTO);
+			JOptionPane.showMessageDialog(null,
+					"Welcome " + insertDTO.getUsername() + "!\nYour account has been created successfully.",
+					"Successful Insertion", JOptionPane.INFORMATION_MESSAGE);
+			closeWindow();
+		} catch (UserDAOException e1) {
+			e1.printStackTrace();
+			JOptionPane.showMessageDialog(null, "User insertion error",
+					"Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	private UserInsertDTO createUserInsertDTO() {
+		UserInsertDTO insertDTO = new UserInsertDTO();
+		insertDTO.setUsername(usernameText.getText().trim());
+		insertDTO.setEmail(emailText.getText().trim());
+		insertDTO.setFirstname(firstnameText.getText().trim());
+		insertDTO.setLastname(lastnameText.getText().trim());
+		insertDTO.setDateOfBirth(dateOfBirth.getDate());
+		insertDTO.setPassword(new String(passwordField.getPassword()).trim());
+		insertDTO.setReEnteredPassword(new String(reEnterPasswordField.getPassword()).trim());
+		return insertDTO;
+	}
+
+	private void renderErrorMessages(Map<String, String> errors) {
+		usernameErrorLabel.setText(errors.getOrDefault("username", ""));
+		emailErrorLabel.setText(errors.getOrDefault("email", ""));
+		firstnameErrorLabel.setText(errors.getOrDefault("firstname", ""));
+		lastnameErrorLabel.setText(errors.getOrDefault("lastname", ""));
+		dateOfBirthErrorLabel.setText(errors.getOrDefault("dob", ""));
+		passwordErrorLabel.setText(errors.getOrDefault("password", ""));
+		reEnterPasswordErrorLabel.setText(errors.getOrDefault("reEnteredPassword", ""));
+	}
+
+	private void closeWindow() {
+		App.getMainMenuFrame().setEnabled(true);
+		cleanAll();
+		dispose();
 	}
 
 	private void cleanErrorLabels() {

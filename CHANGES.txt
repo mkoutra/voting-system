@@ -42,3 +42,16 @@
   - Overload validate() method in Validator to replace the classes ChangePasswordValidator and CandidateDTOValidator
   - Remove ChangePasswordValidator, LoginValidator and CandidateDTOValidator. Their functionality replaced
     by overloading the validator() method in Validator utility class.
+
+  - Move RenderingUtil to /util folder
+
+- Sep 11, 2024
+  - Add skipping testing information in README.
+  - Add CHANGES.txt to .gitignore
+  - Create Mappers class
+  - Refactor InsertNewUserFrame:
+    Among other things, the windowActivated removed.
+  - Refactor AdminOptionsFrame
+  - Refactor CandidatesFrame:
+    - On delete clicked, update table after deletion
+  - Refactor ChangePasswordframe: Remove windowActivated

@@ -63,6 +63,8 @@ If you have installed Java 11 and above in your system and you have an MySQL ser
   mvn clean package
   ```
 
+Note: To avoid testing add the following in your maven command: `Dmaven.test.skip=true`
+
 ### Running the Application
 
 After building the project, an executable JAR file named `voting-system.jar` will be generated in the `target/` directory.

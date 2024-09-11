@@ -40,16 +40,7 @@ public class MainMenuFrame extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent e) {
-				try {
-					if (userDAO.usernameExists("admin")) {
-						return;
-					}
-					userService.createAdminAccount();
-				} catch (UserDAOException e1) {
-					e1.printStackTrace();
-					JOptionPane.showMessageDialog(null, "Admin insertion error",
-							"Admin Error", JOptionPane.ERROR_MESSAGE);
-				}
+				onWindowOpened();
 			}
 
 			@Override
@@ -172,15 +163,26 @@ public class MainMenuFrame extends JFrame {
 		panel_2.add(lblLogInTo);
 	}
 
+	private void onWindowOpened() {
+		try {
+			if (userDAO.usernameExists("admin")) return;
+
+			userService.createAdminAccount();
+		} catch (UserDAOException e1) {
+			e1.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Admin insertion error",
+					"Admin Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
 	private void onSignInClicked() {
 		try {
 			UserLoginDTO userLoginDTO = createUserLoginDTO();
 			boolean isValidInput = false;
 			boolean isAuthenticated = false;
 
-			// Validate
+			// Validation
 			isValidInput = Validator.validate(userLoginDTO).isEmpty();
-
 			if (!isValidInput) {
 				failedLoginText.setVisible(true);
 				return;
@@ -211,21 +213,18 @@ public class MainMenuFrame extends JFrame {
 	}
 
 	private UserLoginDTO createUserLoginDTO() {
-		UserLoginDTO dto = new UserLoginDTO();
-		dto.setUsername(usernameText.getText().trim());
-		dto.setPassword(new String(passwordField.getPassword()).trim());
-		return dto;
+		String usernameInput = usernameText.getText().trim();
+		String usernamePassword = new String(passwordField.getPassword()).trim();
+		return new UserLoginDTO(usernameInput, usernamePassword);
 	}
 
 	private UserReadOnlyDTO mapToReadOnlyDTO(UserLoginDTO loginDTO) {
-		UserReadOnlyDTO readOnlyDTO = new UserReadOnlyDTO();
+		UserReadOnlyDTO readOnlyDTO = null;
 		try {
 			User user = userService.getUserByUsername(loginDTO.getUsername());
-			readOnlyDTO.setUsername(user.getUsername());
-			readOnlyDTO.setFirstname(user.getFirstname());
-			readOnlyDTO.setLastname(user.getLastname());
+			readOnlyDTO = new UserReadOnlyDTO(user.getUsername(), user.getFirstname(), user.getLastname());
 		} catch (UserNotFoundException | UserDAOException e) {
-			e.printStackTrace();	// TODO: implement proper logging
+			e.printStackTrace();
 		}
 		return readOnlyDTO;
 	}
